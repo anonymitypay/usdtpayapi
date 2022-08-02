@@ -13,6 +13,8 @@
 - [独角数卡USDT支付插件tokn188版本下载](https://github.com/utgpay2/dujiaokausdtapi)
 - [SSPanel USDT支付插件tokn188版本下载](https://github.com/utgpay2/SSPanelusdtapi)
 - [V2Board USDT支付插件tokn188版本下载](https://github.com/utgpay2/V2Boardusdtapi)
+- [易支付 USDT支付插件tokn188版本](https://github.com/anonymitypay/yipaiusdt-token188)
+
 -
 让数字货币支付更简单
 TOKEN188商户平台是为有在线收款需求的商家提供的数字货币支付解决方案。在TOKEN188 添加您需要监听的收款地址 然后 在您的网站/App 添加回调地址接受到款通知即可享受安全高效的数字货币收款。使用您自己的USDT地址收款没有中间商，也不用担心跑路
@@ -30,7 +32,7 @@ TOKEN188商户平台是为有在线收款需求的商家提供的数字货币支
 
  - [TOKEN188主页介绍,USDT地址监控API平台](https://www.token188.com)
  - [TOKEN188钱包](https://www.token188.com)（即将推出）
- - [商户平台](https://www.token188.com/manager)
+ - [商户平台](https://mar.token188.com/)
 
 ### 支持更多币种
 我们随时接纳更多的币种，如果你想让你所支持的币种在数千个商家中能购买商品或服务，欢迎联系我们。
