@@ -46,7 +46,7 @@ TOKEN188商户平台是为有在线收款需求的商家提供的数字货币支
 ### WHMCS
 
 <a href="https://github.com/bitpaydev/bitpayxForWHMCS">
-<img src="https://dcdn.mugglepay.com/pay/media/git/whmcs.png" height="50px" style="padding-right: 50px;"/>
+<img src="https://dcdn.188pay.com/pay/media/git/whmcs.png" height="50px" style="padding-right: 50px;"/>
 </a>
 
 WHMCS是一套国外流行的域名主机管理软件，跟国内众所周知的IDCSystem一样，主要在用户管理、财务管理、域名接口、服务器管理面板接口等方面设计的非常人性化。WHMCS是一套全面支持域名注册管理解析，主机开通管理，VPS开通管理和服务器管理。
@@ -72,7 +72,7 @@ WHMCS是一套国外流行的域名主机管理软件，跟国内众所周知的
 
 
 ## 安装流程
-1. 注册[TOKEN188商户中心](https://www.token188.com/manager)
+1. 注册[TOKEN188商户中心](https://mar.188pay.com/)
 2. 在商户中心添加需要监听的地址
 3. 根据使用的不同面板进行回调设置
 
