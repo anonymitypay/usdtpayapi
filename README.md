@@ -30,9 +30,9 @@ TOKEN188商户平台是为有在线收款需求的商家提供的数字货币支
 
 ### 产品介绍
 
- - [TOKEN188主页介绍,USDT地址监控API平台](https://www.token188.com)
- - [TOKEN188钱包](https://www.token188.com)（即将推出）
- - [商户平台](https://mar.token188.com/)
+ - [TOKEN188主页介绍,USDT地址监控API平台](https://www.188pay.net)
+ - [TOKEN188钱包](https://www.188pay.net/)（即将推出）
+ - [商户平台](https://mar.188pay.net/)
 
 ### 支持更多币种
 我们随时接纳更多的币种，如果你想让你所支持的币种在数千个商家中能购买商品或服务，欢迎联系我们。
