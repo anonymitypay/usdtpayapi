@@ -1,5 +1,5 @@
 /**
- * 188Pay 回调验证示例 (Node.js / Express)
+ * 188Pay  回调验证示例 (Node.js / Express)
  *
  * 支持 EPay 模式和标准模式，签名验证逻辑相同。
  *
