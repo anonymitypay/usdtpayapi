@@ -1,47 +1,88 @@
 <?php
-	//获得回调内容
-	$content = file_get_contents('php://input');
-	//转为json
-	$json_param = json_decode($content);
-	//把sign取出来
-	$oldsign = $json_param->sign;
-	//组装内容 sign不参与签名
-    $param=array(
-		'amount'=>$json_param->amount,
-		'merchantId'=>$json_param->merchantId,
-		'blockNumber'=>$json_param->blockNumber,
-		'from'=>$json_param->from,
-		'notifyId'=>$json_param->notifyId,
-		'chainType'=>$json_param->chainType,
-		'to'=>$json_param->to,
-		'type'=>$json_param->type,
-		'nonce'=>$json_param->nonce,
-		'transactionId'=>$json_param->transactionId,
-		'timestamp'=>$json_param->timestamp,
-	);
-	//排序 
-	$p = ksort($param);
-	//组合成签名内容格式
-	if ($p) {
-		$str = '';
-		foreach ($param as $k => $val) {
-			$str .= $k . '=' . $val . '&';
-		}
-		$strs = rtrim($str, '&');
-	}
-	//最后加&key
-	//完整的签名示例
-	// amount=&blockNumber=30353922&chainType=TRX&from=TTWvC73pGXHa2rqEcMvB6VpxpZir6p3stF&merchantId=1379681731801534464&nonce=lLqsk7zMPijfHQry&notifyId=1395356165638725632&timestamp=1621513808991&to=TKupfvz3j5YTZkaTioidW3Yyn8zzjaKuxa&transactionId=0abb4ee8fbcc6c1a2f6ffdd2ced135787225343afe587fafce5ee7e2e1a7fa6f&type=monitor&key=P9MBo4O91rYQ2VvT
-	$strs .='&key=P9MBo4O91rYQ2VvT';
-	//对内容进行MD5 
-	$sign=md5($strs);
-	//把回调的sign 与MD5 签名数据对比
-	if($oldsign == $sign){ 
-		//对比成功返回success
-		echo "success";
-	}else{ 
-		//失败返回fail
-		echo "fail";
-	} 
+/**
+ * 188Pay 回调验证示例 (PHP)
+ *
+ * 支持两种模式：
+ * 1. EPay 模式 - 独角数卡 / V2Board / SSPanel 等系统使用
+ * 2. 标准模式 - 自研系统使用标准 JSON 接口
+ *
+ * 两种模式的签名验证逻辑相同，仅回调参数字段不同。
+ */
 
-?>
+// ============================================
+// 配置：请替换为您的密钥
+// ============================================
+$secretKey = 'YOUR_SECRET_KEY';
+
+// ============================================
+// 接收回调数据
+// ============================================
+$content = file_get_contents('php://input');
+$data = json_decode($content, true);
+
+if (!$data || !isset($data['sign'])) {
+    echo 'fail';
+    exit;
+}
+
+// ============================================
+// 验证签名
+// ============================================
+$receivedSign = $data['sign'];
+
+// 移除不参与签名的字段
+unset($data['sign'], $data['sign_type']);
+
+// 移除空值参数
+$data = array_filter($data, function ($v) {
+    return $v !== '' && $v !== null;
+});
+
+// 按参数名 ASCII 码排序
+ksort($data);
+
+// 拼接为 key=value& 格式
+$str = '';
+foreach ($data as $k => $v) {
+    $str .= $k . '=' . $v . '&';
+}
+$str = rtrim($str, '&');
+
+// 追加密钥
+$str .= '&secret_key=' . $secretKey;
+
+// MD5 签名
+$sign = md5($str);
+
+// 验证
+if ($receivedSign === $sign) {
+    /**
+     * 签名验证通过，处理业务逻辑
+     *
+     * EPay 模式可用字段：
+     *   $data['pid']          - 商户 ID
+     *   $data['type']         - 币种类型 (usdt / trx)
+     *   $data['out_trade_no'] - 商户订单号
+     *   $data['name']         - 订单标题
+     *   $data['money']        - 订单金额
+     *   $data['status']       - 订单状态 (completed)
+     *
+     * 标准模式可用字段：
+     *   $data['trade_no']      - 系统订单号
+     *   $data['out_trade_no']  - 商户订单号
+     *   $data['amount']        - 订单金额
+     *   $data['actual_amount'] - 实际支付加密货币数量
+     *   $data['coin_type']     - 币种类型
+     *   $data['status']        - 订单状态 (completed)
+     *   $data['tx_hash']       - 区块链交易哈希
+     */
+
+    // TODO: 在此处理您的业务逻辑
+    // 例如：更新订单状态、发货、开通服务等
+
+    // 返回 success 告知 188Pay 回调已处理
+    echo 'success';
+} else {
+    // 签名验证失败
+    echo 'fail';
+}
