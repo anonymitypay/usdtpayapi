@@ -79,9 +79,13 @@
 
 | 配置项 | 值 |
 |--------|------|
-| 网关地址 | `https://你的域名/epay/` |
+| 网关地址 / 商户KEY | 见下方平台说明 |
 | 商户 ID | 在 API 密钥页面获取 |
 | 密钥 | 在 API 密钥页面获取 |
+
+> **网关地址填写说明：**
+> - **独角数卡**：`商户KEY` 字段填写「API 提交地址」，即 `https://你的域名/submit.php`
+> - **V2Board / SSPanel**：「网关地址」填写 `https://你的域名`，系统会自动拼接 `/submit.php`
 
 ### 兼容的平台列表
 
@@ -143,18 +147,18 @@
 
 ### 2. 回调通知
 
-支付成功后，系统向 `notify_url` 发送 **POST** 请求（`Content-Type: application/json`）。
+支付成功后，系统向 `notify_url` 发送 **POST** 请求（`Content-Type: application/x-www-form-urlencoded`）。
 
 **回调参数：**
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
 | `pid` | string | 商户 ID |
-| `type` | string | 币种类型 |
+| `trade_no` | string | 系统订单号 |
 | `out_trade_no` | string | 商户订单号 |
-| `name` | string | 订单标题 |
 | `money` | string | 订单金额 |
-| `status` | string | 订单状态（`completed`） |
+| `type` | string | 币种类型 |
+| `trade_status` | string | 交易状态（`TRADE_SUCCESS` / `WAIT_BUYER_PAY`） |
 | `sign` | string | 签名 |
 | `sign_type` | string | 签名类型（`MD5`） |
 
@@ -181,10 +185,10 @@ money=100&notify_url=https://你的网站/callback&out_trade_no=ORDER_001&pid=YO
 
 **第二步：拼接密钥并 MD5**
 
-在拼接字符串末尾追加 `&secret_key=你的密钥`，然后 MD5 取小写：
+在拼接字符串末尾**直接追加**密钥（无任何分隔符），然后 MD5 取小写：
 
 ```
-sign = MD5("money=100&notify_url=https://你的网站/callback&out_trade_no=ORDER_001&pid=YOUR_PID&type=usdt&secret_key=YOUR_SECRET_KEY")
+sign = MD5("money=100&notify_url=https://你的网站/callback&out_trade_no=ORDER_001&pid=YOUR_PID&type=usdt" + "YOUR_SECRET_KEY")
 ```
 
 **PHP 签名示例：**
@@ -205,8 +209,8 @@ function epaySign($params, $secretKey) {
     // 拼接为 key=value& 格式
     $str = urldecode(http_build_query($params));
 
-    // 追加密钥并 MD5
-    return md5($str . '&secret_key=' . $secretKey);
+    // 直接追加密钥（无分隔符）并 MD5
+    return md5($str . $secretKey);
 }
 ```
 
@@ -481,14 +485,16 @@ def callback():
 ### Q: 如何在独角数卡中配置？
 
 在独角数卡后台 → 支付配置 → 添加支付方式 → 选择「易支付」：
-- 网关地址：`https://你的域名/epay/`
-- 商户 ID：在 188Pay 的 API 密钥页面获取
-- 密钥：在 188Pay 的 API 密钥页面获取
+- **商户 KEY**（网关地址）：填写 API 密钥页面的「API 提交地址」，即 `https://你的域名/submit.php`
+- **商户 ID**：在 188Pay 的 API 密钥页面获取
+- **商户密钥**：在 188Pay 的 API 密钥页面获取
+
+> 注意：独角数卡的「商户KEY」字段直接作为表单提交地址，**必须填写带 `/submit.php` 的完整地址**，不能只填根域名。
 
 ### Q: 如何在 V2Board 中配置？
 
 在 V2Board 后台 → 支付配置 → 添加支付方式 → 选择「易支付」：
-- 网关地址：`https://你的域名/epay/`
+- **网关地址**：填写 API 密钥页面的「EPay 网关地址」，即 `https://你的域名`（V2Board 会自动拼接 `/submit.php`）
 - 商户 ID 和密钥同上
 
 ### Q: 回调一直失败怎么办？
