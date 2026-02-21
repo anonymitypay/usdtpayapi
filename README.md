@@ -3,7 +3,7 @@
 > 支持 TRON / Ethereum / BSC / Polygon / Bitcoin / Solana，接受 USDT、ETH、BNB、BTC、SOL 等主流加密货币。资金直达您自己的钱包，无中间商。
 
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-188pay.net-brightgreen.svg)](https://www.188pay.net)
+[![Platform](https://img.shields.io/badge/platform-188pay.top-brightgreen.svg)](https://www.188pay.top)
 [![Telegram](https://img.shields.io/badge/telegram-token188-blue.svg?logo=telegram)](https://t.me/token188)
 
 ---
@@ -42,7 +42,7 @@
 
 ### 第 1 步：注册商户
 
-前往 [188Pay 商户平台](https://mar.188pay.net/) 注册账号。
+前往 [188Pay 商户平台](https://www.188pay.top/login) 注册账号。
 
 ### 第 2 步：添加收款钱包
 
@@ -520,8 +520,8 @@ def callback():
 
 ## 联系我们
 
-- 官网：[188pay.net](https://www.188pay.net)
-- 商户平台：[mar.188pay.net](https://mar.188pay.net)
+- 官网：[188pay.top](https://www.188pay.top)
+- 商户平台：[www.188pay.top](https://www.188pay.top/login)
 - Telegram：[@token188](https://t.me/token188)
 
 ---
