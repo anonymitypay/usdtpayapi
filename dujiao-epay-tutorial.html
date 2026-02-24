@@ -878,7 +878,7 @@ body {
       </div>
       <div style="background:var(--surface);border:1px solid rgba(245,159,0,.4);border-left:3px solid var(--warn);border-radius:8px;padding:12px 14px;">
         <div style="font-size:.7rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">③ 商户密钥</div>
-        <div style="font-size:.78rem;color:var(--text-soft);">填入 188pay 的<strong style="color:var(--text);">密钥（key）</strong>，从 API密钥页面复制</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">填入 188pay 的<strong style="color:var(--text);">商户密钥</strong>，从 API密钥页面复制</div>
       </div>
     </div>
 
@@ -903,11 +903,11 @@ body {
       <div class="summary-card-val green">/pay/yipay</div>
     </div>
     <div class="summary-card">
-      <div class="summary-card-label">商户号（pid）</div>
+      <div class="summary-card-label">商户 ID（pid）</div>
       <div class="summary-card-val">从 188pay 商户中心复制</div>
     </div>
     <div class="summary-card">
-      <div class="summary-card-label">密钥（key）</div>
+      <div class="summary-card-label">商户密钥（key）</div>
       <div class="summary-card-val">从 188pay 商户中心复制</div>
     </div>
     <div class="summary-card full">
@@ -932,15 +932,46 @@ body {
   <div style="display:flex;flex-direction:column;gap:10px;">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
       <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 有很多易支付行，改哪一个？</div>
-      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">改任意一个即可，建议直接改名字里有「易支付」或路由是 <code style="font-family:monospace;color:var(--accent);">/pay/yipay</code> 的第一行。如果要同时接 USDT 和 TRX，可以分别改两行，接口地址相同、商户ID密钥相同，type 参数会自动传递。</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">改任意一个即可，建议直接改名字里有「易支付」或路由是 <code style="font-family:monospace;color:var(--accent);">/pay/yipay</code> 的第一行。如果要同时接 USDT 和 TRX，可以分别改两行，商户KEY（网关）相同、商户ID与商户密钥相同，type 参数会自动传递。</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
       <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 改完后用户看到的是旧名字，怎么改？</div>
-      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">在编辑表单最上面的「名称」字段改为你想显示的名字（如 USDT 支付 / 188pay），这是前台用户看到的支付方式名称。</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">在编辑表单最上面的「支付名称」字段改为你想显示的名字（如 USDT 支付 / 188pay），这是前台用户看到的支付方式名称。</div>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
       <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 旧版独角自定义插件还能用吗？</div>
       <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">旧插件走私有协议（字段名不兼容），不推荐继续使用。独角内置的易支付协议完全兼容 188pay，直接修改现有配置即可，无需任何插件。</div>
+    </div>
+  </div>
+
+  <!-- ── 错误排查 ── -->
+  <div class="section-header" style="margin-top:40px;"><h2>错误排查</h2></div>
+
+  <div style="background:rgba(245,159,0,.08);border:1px solid rgba(245,159,0,.35);border-left:3px solid var(--warn);border-radius:10px;padding:18px 20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid var(--warn);font-size:.72rem;font-weight:700;color:var(--warn);flex-shrink:0;">!</span>
+      <span style="font-weight:700;font-size:.9rem;color:#fbbf24;">常见错误排查：</span>
+    </div>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:9px;padding:0;">
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">网关地址填错：</strong>请确保包含 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">https://</code>，推荐填完整路径 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">https://api2.188pay.top/submit.php</code>，不要漏掉 <code style="font-family:monospace;font-size:.8rem;color:var(--text-soft);">/submit.php</code>。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">签名错误：</strong>请检查商户 ID 和商户密钥是否复制完整，粘贴时不要包含多余的空格或换行符。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">支付类型未生效：</strong>独角在创建订单时会自动传递 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">type=usdt</code> 或 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">type=trx</code>，如收款地址未添加或币种未开启，订单会报错。请先在 188pay 商户中心确认地址已添加并启用。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">支付成功但订单未自动完成：</strong>检查独角后台的 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">notify_url</code> 是否可被公网访问，本地开发环境（localhost）无法收到回调，需部署到公网。</span>
+      </li>
+    </ul>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(245,159,0,.2);font-size:.78rem;color:var(--text-muted);">
+      仍无法解决？联系 <a href="https://t.me/188pay" style="color:var(--warn);text-decoration:none;font-weight:600;">Telegram @188pay</a> 获取支持
     </div>
   </div>
 
