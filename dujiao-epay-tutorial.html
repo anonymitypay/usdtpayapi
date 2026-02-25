@@ -419,9 +419,81 @@ body {
 .footer a { color: var(--accent); text-decoration: none; }
 
 @media (max-width: 600px) {
-  .hero h1 { font-size: 1.8rem; }
-  .summary-grid { grid-template-columns: 1fr; }
+  html { font-size: 14px; }
+  .hero { padding: 40px 16px 36px; }
+  .hero h1 { font-size: 1.5rem; }
+  .hero h1 .x { margin: 0 4px; }
+  .hero-sub { font-size: .85rem; }
+  .hero-chips { gap: 6px; }
+  .chip { padding: 5px 10px; font-size: .72rem; }
+
+  .wrapper { padding: 0 12px 60px; }
+
+  /* Hide sidebar in all mockups */
   .dj-sidebar { display: none; }
+  .dj-admin { min-height: auto !important; }
+
+  /* Topbar */
+  .dj-topbar { padding: 0 10px; height: 40px; }
+  .dj-topbar-right { font-size: .7rem; gap: 6px; }
+
+  /* Tables: horizontal scroll */
+  .dj-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dj-table { min-width: 480px; }
+  .dj-page { padding: 10px 12px; }
+
+  /* Form: stack label on top of value */
+  .dj-form-row { grid-template-columns: 1fr !important; }
+  .dj-form-label { border-right: none !important; border-bottom: 1px solid #f1f5f9; }
+  .dj-form-val textarea { min-height: 50px !important; font-size: .65rem !important; }
+
+  /* UI Frame */
+  .ui-frame { border-radius: 10px; }
+  .frame-bar { padding: 8px 10px; gap: 6px; }
+  .frame-url { font-size: .6rem; padding: 3px 8px; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Step flow */
+  .step-flow { gap: 32px; }
+  .step-header { gap: 10px; }
+  .step-badge { width: 32px; height: 32px; font-size: .75rem; border-radius: 8px; }
+  .step-title { font-size: .95rem; }
+  .step-title span { display: block; margin-left: 0; margin-top: 2px; font-size: .8rem; }
+
+  /* API keys mockup: reduce padding, allow button wrap */
+  .apikeys-mockup { padding: 16px 12px 16px !important; }
+  .apikeys-mockup div[style*="display:flex"][style*="gap:10px"] { flex-wrap: wrap; }
+  .apikeys-mockup button { flex-shrink: 0; }
+  .apikeys-mockup div[style*="letter-spacing:3px"] { letter-spacing: 1px !important; overflow: hidden; }
+  .apikeys-mockup div[style*="font-family:'JetBrains Mono'"] { word-break: break-all; font-size: .72rem !important; }
+  .apikeys-mockup div[style*="padding:18px 20px"] { padding: 14px 12px !important; }
+
+  /* 3-col field descriptions → 1 col */
+  .field-desc-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Summary grid */
+  .summary-grid { grid-template-columns: 1fr; }
+
+  /* Version notice */
+  .version-notice { padding: 14px 14px; gap: 10px; }
+  .version-notice-text { font-size: .82rem; }
+
+  /* Prereq */
+  .prereq { padding: 12px 14px; gap: 10px; }
+
+  /* Info notes */
+  .info-note { font-size: .78rem; padding: 10px 12px; }
+
+  /* Q&A cards */
+  .footer { font-size: .7rem; padding: 24px 0 16px; }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+  .hero h1 { font-size: 1.3rem; }
+  .wrapper { padding: 0 8px 48px; }
+  .dj-table { min-width: 400px; }
 }
 </style>
 </head>
@@ -499,7 +571,7 @@ body {
         </a>
       </div>
       <!-- 188pay API Keys 页面还原 —— 无浮动气泡，编号直接嵌入每个卡片标题 -->
-      <div style="background:#f5f5f5;padding:28px 32px 24px;">
+      <div class="apikeys-mockup" style="background:#f5f5f5;padding:28px 32px 24px;">
         <div style="font-size:1.4rem;font-weight:700;color:#111;margin-bottom:20px;font-family:'Noto Sans SC',sans-serif;">API 密钥</div>
 
         <!-- ① 商户ID卡片 -->
@@ -867,7 +939,7 @@ body {
     </div>
 
     <!-- 3个字段说明 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;">
+    <div class="field-desc-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;">
       <div style="background:var(--surface);border:1px solid rgba(239,68,68,.4);border-left:3px solid #ef4444;border-radius:8px;padding:12px 14px;">
         <div style="font-size:.7rem;font-weight:700;color:#fca5a5;margin-bottom:4px;">① 商户 ID</div>
         <div style="font-size:.78rem;color:var(--text-soft);">填入 188pay 的<strong style="color:var(--text);">商户ID（pid）</strong>，从 API密钥页面复制</div>

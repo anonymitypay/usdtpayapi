@@ -391,10 +391,70 @@ body {
 .footer a { color: var(--accent); text-decoration: none; }
 
 @media (max-width: 600px) {
-  .hero h1 { font-size: 1.8rem; }
-  .summary-grid { grid-template-columns: 1fr; }
+  html { font-size: 14px; }
+  .hero { padding: 40px 16px 36px; }
+  .hero h1 { font-size: 1.5rem; }
+  .hero h1 .x { margin: 0 4px; }
+  .hero-sub { font-size: .85rem; }
+  .hero-chips { gap: 6px; }
+  .chip { padding: 5px 10px; font-size: .72rem; }
+
+  .wrapper { padding: 0 12px 60px; }
+
+  /* Hide sidebar in all mockups */
   .v2-sidebar { display: none; }
-  .v2-modal { width: calc(100% - 24px); }
+  .v2-admin { min-height: auto !important; }
+
+  /* Topbar */
+  .v2-topbar { padding: 0 10px; height: 42px; }
+  .v2-topbar-right { font-size: .7rem; gap: 6px; }
+  .v2-page { padding: 12px; }
+
+  /* Tables: horizontal scroll */
+  .v2-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .v2-table { min-width: 420px; }
+
+  /* Modal: fit screen */
+  .v2-modal { width: calc(100% - 16px); max-height: 80vh; overflow-y: auto; }
+  .v2-modal-body { padding: 12px 14px; }
+  .v2-field-input { font-size: .75rem; padding: 7px 10px; }
+
+  /* Config rows: stack */
+  .v2-config-row { grid-template-columns: 1fr !important; gap: 4px; }
+  .v2-config-key { padding-right: 0; }
+  .v2-config-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .v2-config-tab { padding: 8px 12px; font-size: .78rem; }
+
+  /* Step flow */
+  .step-flow { gap: 32px; }
+  .step-header { gap: 10px; }
+  .step-badge { width: 32px; height: 32px; font-size: .75rem; border-radius: 8px; }
+  .step-title { font-size: .95rem; }
+  .step-title span { display: block; margin-left: 0; margin-top: 2px; font-size: .8rem; }
+
+  /* UI Frame */
+  .ui-frame { border-radius: 10px; }
+  .frame-bar { padding: 8px 10px; gap: 6px; }
+  .frame-url { font-size: .6rem; padding: 3px 8px; overflow: hidden; text-overflow: ellipsis; }
+
+  /* 2-col grids → 1 col */
+  .field-desc-grid { grid-template-columns: 1fr !important; }
+  .summary-grid { grid-template-columns: 1fr; }
+
+  /* Version notice */
+  .version-notice { padding: 14px 14px; gap: 10px; }
+
+  /* Info notes */
+  .info-note { font-size: .78rem; padding: 10px 12px; }
+
+  .footer { font-size: .7rem; padding: 24px 0 16px; }
+}
+
+@media (max-width: 400px) {
+  .hero h1 { font-size: 1.3rem; }
+  .wrapper { padding: 0 8px 48px; }
+  .v2-table { min-width: 360px; }
+  .v2-modal { width: calc(100% - 8px); }
 }
 </style>
 </head>
@@ -865,7 +925,7 @@ body {
     </div>
 
     <!-- 字段说明卡片 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+    <div class="field-desc-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
       <div style="background:var(--surface);border:1px solid rgba(79,110,247,.4);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;">
         <div style="font-size:.7rem;font-weight:700;color:#93a8fb;margin-bottom:4px;">① 接口文件</div>
         <div style="font-size:.78rem;color:var(--text-soft);">下拉选择 <strong style="color:var(--text);">EPay</strong>（易支付），不要选 Stripe / PayPal 等其他驱动</div>
