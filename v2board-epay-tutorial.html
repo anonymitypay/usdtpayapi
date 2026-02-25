@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V2Board 接入 188pay 易支付 — 配置教程</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c0e14;
+  --surface: #13161f;
+  --surface2: #1a1d28;
+  --border: #272b3a;
+  --border2: #323649;
+  --text: #e8eaf0;
+  --text-soft: #8b91a8;
+  --text-muted: #565c75;
+  --accent: #4f6ef7;
+  --accent-glow: rgba(79,110,247,.18);
+  --accent-light: rgba(79,110,247,.12);
+  --green: #22c55e;
+  --green-glow: rgba(34,197,94,.15);
+  --red: #ef4444;
+  --red-light: rgba(239,68,68,.12);
+  --warn: #f59f00;
+  --warn-light: rgba(245,159,0,.1);
+  --step1: #4f6ef7;
+  --step2: #a855f7;
+  --step3: #06b6d4;
+  --step4: #22c55e;
+
+  /* V2Board UI colors */
+  --v2-sidebar: #1e3a8a;
+  --v2-sidebar-active: #2563eb;
+  --v2-sidebar-hover: rgba(255,255,255,.08);
+  --v2-sidebar-text: rgba(255,255,255,.72);
+  --v2-bg: #f0f2f5;
+  --v2-white: #ffffff;
+  --v2-border: #e5e7eb;
+  --v2-text: #1f2937;
+  --v2-text-soft: #6b7280;
+  --v2-header: #ffffff;
+  --v2-blue: #2563eb;
+}
+
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  padding: 64px 24px 56px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(79,110,247,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168,85,247,.08) 0%, transparent 60%);
+}
+.hero-inner { position: relative; max-width: 680px; margin: 0 auto; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-light);
+  border: 1px solid rgba(79,110,247,.3);
+  border-radius: 999px;
+  padding: 5px 16px;
+  font-size: .75rem;
+  color: #93a8fb;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.5px;
+  margin-bottom: 14px;
+}
+.hero h1 .brand { color: var(--accent); }
+.hero h1 .x { color: var(--text-muted); margin: 0 8px; font-weight: 300; }
+.hero-sub { color: var(--text-soft); font-size: .95rem; margin-bottom: 32px; line-height: 1.7; }
+.hero-chips { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.chip {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: .78rem;
+  color: var(--text-soft);
+}
+.chip strong { color: var(--text); }
+
+/* ── WRAPPER ── */
+.wrapper { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ── VERSION NOTICE BANNER ── */
+.version-notice {
+  display: flex;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(245,159,0,.14) 0%, rgba(239,68,68,.08) 100%);
+  border: 1.5px solid rgba(245,159,0,.5);
+  border-left: 4px solid var(--warn);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 32px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.version-notice::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--warn), transparent);
+}
+.version-notice-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 1px; filter: drop-shadow(0 0 8px rgba(245,159,0,.5)); }
+.version-notice-title { font-size: .82rem; font-weight: 800; color: var(--warn); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 6px; }
+.version-notice-text { font-size: .9rem; color: #e8c87a; line-height: 1.65; }
+.version-notice-text strong { color: #fbbf24; font-weight: 700; }
+
+/* ── PREREQ ── */
+.prereq {
+  display: flex; gap: 14px;
+  background: var(--warn-light);
+  border: 1px solid rgba(245,159,0,.25);
+  border-left: 3px solid var(--warn);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 40px 0;
+}
+.prereq-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.prereq h3 { font-size: .75rem; font-weight: 700; color: var(--warn); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
+.prereq ul { list-style: none; }
+.prereq li { font-size: .85rem; color: #d4a820; padding: 2px 0; }
+.prereq li::before { content: '·'; margin-right: 6px; font-weight: 700; }
+
+/* ── STEP FLOW ── */
+.step-flow { display: flex; flex-direction: column; gap: 48px; margin-top: 16px; }
+.step-block { position: relative; }
+.step-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.step-badge {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.step-badge.s1 { background: rgba(79,110,247,.15); color: var(--step1); border: 1px solid rgba(79,110,247,.3); }
+.step-badge.s2 { background: rgba(168,85,247,.15); color: var(--step2); border: 1px solid rgba(168,85,247,.3); }
+.step-badge.s3 { background: rgba(6,182,212,.15); color: var(--step3); border: 1px solid rgba(6,182,212,.3); }
+.step-badge.s4 { background: rgba(34,197,94,.15); color: var(--step4); border: 1px solid rgba(34,197,94,.3); }
+.step-num-label { font-size: .72rem; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.step-title { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+.step-title span { opacity: .6; font-weight: 400; font-size: .95rem; margin-left: 8px; }
+
+/* ── UI FRAME ── */
+.ui-frame {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.04) inset;
+}
+.frame-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.frame-dots { display: flex; gap: 6px; }
+.fd { width: 11px; height: 11px; border-radius: 50%; }
+.fd-r { background: #ff5f57; } .fd-y { background: #febc2e; } .fd-g { background: #28c840; }
+.frame-url {
+  flex: 1; background: rgba(255,255,255,.05); border: 1px solid var(--border2);
+  border-radius: 5px; padding: 4px 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--text-muted);
+}
+.frame-lock { font-size: .75rem; color: var(--green); margin-right: 4px; }
+
+/* ── V2BOARD ADMIN UI ── */
+.v2-admin { display: flex; min-height: 400px; background: var(--v2-bg); }
+
+/* Sidebar */
+.v2-sidebar {
+  width: 200px; flex-shrink: 0;
+  background: var(--v2-sidebar);
+  display: flex; flex-direction: column;
+}
+.v2-logo {
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.v2-logo-text { font-size: .95rem; font-weight: 700; color: #fff; letter-spacing: .5px; }
+.v2-topbar {
+  background: var(--v2-header);
+  border-bottom: 1px solid var(--v2-border);
+  height: 50px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+.v2-topbar-title { font-size: .9rem; font-weight: 600; color: var(--v2-text); }
+.v2-topbar-right { display: flex; align-items: center; gap: 12px; font-size: .78rem; color: var(--v2-text-soft); }
+.v2-user { display: flex; align-items: center; gap: 6px; font-size: .8rem; }
+.v2-nav { padding: 8px 0; flex: 1; overflow: auto; }
+.v2-nav-section { font-size: .65rem; color: rgba(255,255,255,.35); letter-spacing: .8px; text-transform: uppercase; padding: 12px 16px 4px; }
+.v2-nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 16px;
+  font-size: .78rem; color: var(--v2-sidebar-text);
+  cursor: pointer;
+}
+.v2-nav-item:hover { background: var(--v2-sidebar-hover); }
+.v2-nav-item.active {
+  background: var(--v2-sidebar-active);
+  color: #fff; font-weight: 600;
+}
+.v2-nav-item .ni { font-size: .78rem; width: 16px; text-align: center; }
+
+/* Main content */
+.v2-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.v2-page { flex: 1; padding: 20px; overflow: auto; }
+
+/* Table */
+.v2-card { background: #fff; border-radius: 8px; border: 1px solid var(--v2-border); overflow: hidden; }
+.v2-card-header {
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--v2-border);
+}
+.v2-card-title { font-size: .85rem; font-weight: 600; color: var(--v2-text); }
+.v2-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 6px; font-size: .75rem; font-weight: 600; cursor: pointer; }
+.v2-btn-primary { background: var(--v2-blue); color: #fff; border: none; }
+.v2-btn-outline { background: #fff; color: var(--v2-text-soft); border: 1px solid var(--v2-border); }
+.v2-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+.v2-table th {
+  background: #f9fafb; padding: 10px 14px;
+  font-size: .72rem; font-weight: 600; color: var(--v2-text-soft);
+  text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--v2-border);
+}
+.v2-table td {
+  padding: 10px 14px; color: var(--v2-text);
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+.v2-table tr:last-child td { border-bottom: none; }
+.v2-toggle-on {
+  display: inline-flex; align-items: center; justify-content: flex-end;
+  width: 36px; height: 20px; background: #2563eb; border-radius: 99px; padding: 2px;
+}
+.v2-toggle-on::after { content: ''; width: 16px; height: 16px; border-radius: 50%; background: #fff; }
+.v2-action-link { color: #2563eb; font-size: .75rem; cursor: pointer; margin-right: 8px; }
+.v2-action-link.danger { color: #ef4444; }
+.v2-mono { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: #475569; }
+
+/* ── MODAL ── */
+.v2-modal-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.3);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 20;
+  border-radius: 0;
+}
+.v2-modal {
+  background: #fff;
+  border-radius: 10px;
+  width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  overflow: hidden;
+  position: relative;
+}
+.v2-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--v2-border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.v2-modal-title { font-size: .9rem; font-weight: 700; color: var(--v2-text); }
+.v2-modal-close { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #9ca3af; font-size: 1rem; cursor: pointer; }
+.v2-modal-body { padding: 16px 20px; }
+.v2-field { margin-bottom: 10px; }
+.v2-field-label { font-size: .78rem; font-weight: 600; color: var(--v2-text); margin-bottom: 5px; }
+.v2-field-hint { font-size: .68rem; color: var(--v2-text-soft); margin-bottom: 5px; }
+.v2-field-input {
+  width: 100%;
+  border: 1.5px solid var(--v2-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: .8rem;
+  color: var(--v2-text);
+  background: #fff;
+  outline: none;
+}
+.v2-field-input.active { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+.v2-field-input.filled-blue { border-color: #93c5fd; background: #eff6ff; color: #1e40af; }
+.v2-field-input.filled-orange { border-color: #fbbf24; background: #fffbeb; color: #92400e; }
+.v2-field-input.filled-purple { border-color: #c4b5fd; background: #f5f3ff; color: #5b21b6; }
+.v2-field-select {
+  width: 100%;
+  border: 1.5px solid #2563eb;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: .8rem;
+  color: #1e40af;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.v2-field-select .sel-label { font-weight: 600; }
+.v2-field-select .sel-hint { color: #ef4444; font-weight: 700; font-size: .72rem; }
+.v2-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--v2-border);
+  display: flex; justify-content: flex-end; gap: 10px;
+  background: #f9fafb;
+}
+
+/* System config page */
+.v2-config-page { padding: 0 20px 20px; }
+.v2-config-tabs {
+  display: flex; gap: 0; border-bottom: 1.5px solid var(--v2-border);
+  margin-bottom: 20px;
+}
+.v2-config-tab {
+  padding: 10px 18px;
+  font-size: .82rem; color: var(--v2-text-soft);
+  cursor: pointer; position: relative;
+  white-space: nowrap;
+}
+.v2-config-tab.active {
+  color: #2563eb; font-weight: 600;
+}
+.v2-config-tab.active::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+  height: 2px; background: #2563eb; border-radius: 2px;
+}
+.v2-config-row {
+  display: grid; grid-template-columns: 200px 1fr;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.v2-config-row:last-child { border-bottom: none; }
+.v2-config-key { font-size: .82rem; font-weight: 600; color: var(--v2-text); padding-right: 16px; }
+.v2-config-desc { font-size: .72rem; color: var(--v2-text-soft); margin-top: 2px; }
+.v2-config-val { display: flex; align-items: center; }
+
+/* ── INFO CALLOUT ── */
+.info-note {
+  display: flex; gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid rgba(79,110,247,.25);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 14px;
+  font-size: .83rem; color: #93a8fb;
+}
+.info-note.green { background: var(--green-glow); border-color: rgba(34,197,94,.25); border-left-color: var(--green); color: #86efac; }
+.info-note.warn { background: var(--warn-light); border-color: rgba(245,159,0,.25); border-left-color: var(--warn); color: #fbbf24; }
+.info-note-icon { flex-shrink: 0; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; align-items: center; gap: 12px; margin: 48px 0 24px; }
+.section-header h2 { font-size: .8rem; font-weight: 700; color: var(--text-muted); letter-spacing: .8px; text-transform: uppercase; }
+.section-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── SUMMARY ── */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.summary-card-label { font-size: .7rem; color: var(--text-muted); letter-spacing: .4px; text-transform: uppercase; margin-bottom: 6px; }
+.summary-card-val { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--accent); word-break: break-all; }
+.summary-card-val.green { color: var(--green); }
+.summary-card.full { grid-column: 1 / -1; }
+
+/* ── FOOTER ── */
+.footer { text-align: center; padding: 40px 0 24px; font-size: .78rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 60px; }
+.footer a { color: var(--accent); text-decoration: none; }
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 1.8rem; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .v2-sidebar { display: none; }
+  .v2-modal { width: calc(100% - 24px); }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><div class="hero-tag-dot"></div>图文配置教程 · 4步完成</div>
+    <h1>
+      <span style="color:var(--text-soft);font-weight:400;font-size:1.8rem;">V2Board</span>
+      <span class="x">×</span>
+      <span class="brand">188pay</span><br>
+      易支付接入指南
+    </h1>
+    <p class="hero-sub">
+      V2Board 内置 EPay 驱动，无需安装插件<br>
+      填入商户信息即可接受 USDT-TRC20 / TRX 支付
+    </p>
+    <div class="hero-chips">
+      <div class="chip"><strong>V2Board</strong> v1.7.x+</div>
+      <div class="chip"><strong>驱动</strong> EPay 易支付</div>
+      <div class="chip"><strong>协议</strong> EPay</div>
+      <div class="chip"><strong>支持</strong> USDT-TRC20 · TRX</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <div class="version-notice">
+    <div class="version-notice-icon">⚠️</div>
+    <div>
+      <div class="version-notice-title">注意 · 图示仅供参考</div>
+      <div class="version-notice-text">
+        本教程中的<strong>界面截图为示意图</strong>，展示的是配置流程的大概位置与步骤。
+        由于 V2Board 版本迭代，<strong>实际界面样式或菜单位置可能与图示略有不同</strong>，请以实际使用版本为准。
+        如遇问题，欢迎联系 <a href="https://t.me/token188" target="_blank" rel="noopener" style="color:#fbbf24;font-weight:700;text-decoration:underline;">Telegram @token188</a> 获取支持。
+      </div>
+    </div>
+  </div>
+
+  <div class="prereq">
+    <div class="prereq-icon">📋</div>
+    <div>
+      <h3>开始前准备</h3>
+      <ul>
+        <li>进入 <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener" style="color:#f59f00;text-decoration:underline;font-family:monospace;font-size:.82rem;">www.188pay.top/dashboard/api-keys</a> 复制商户ID（PID）和密钥（KEY）</li>
+        <li>用管理员账号登录 V2Board 管理后台</li>
+        <li>确认收款钱包已在 188pay 添加并启用 USDT 或 TRX</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step-flow">
+
+  <!-- ── STEP 0 ── 获取凭证 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s1">00</div>
+      <div class="step-title-block">
+        <div class="step-num-label">准备工作</div>
+        <div class="step-title">获取 188pay 商户凭证<span>PID + KEY，填写 V2Board 时需要用到</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener"
+           class="frame-url" style="color:#86efac;text-decoration:none;cursor:pointer;"
+           onmouseover="this.style.color='#22c55e'" onmouseout="this.style.color='#86efac'">
+          <span class="frame-lock">🔒</span>www.188pay.top/dashboard/api-keys
+          <span style="margin-left:6px;font-size:.65rem;opacity:.6;">↗ 点击直达</span>
+        </a>
+      </div>
+      <div style="background:#f5f5f5;padding:28px 32px 24px;">
+        <div style="font-size:1.4rem;font-weight:700;color:#111;margin-bottom:20px;font-family:'Noto Sans SC',sans-serif;">API 密钥</div>
+
+        <!-- ① 商户ID -->
+        <div style="background:#fff;border:1.5px solid #2563eb;border-radius:10px;padding:18px 20px;margin-bottom:12px;box-shadow:0 0 0 3px rgba(37,99,235,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="background:#2563eb;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">① 复制</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;">商户 ID（PID）</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入 V2Board「PID」字段</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#374151;border:1px solid #e5e7eb;">
+              a1b2c3d4-e5f6-7890-abcd-ef1234567890
+            </div>
+            <button style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:600;">复制</button>
+          </div>
+        </div>
+
+        <!-- ② 密钥 -->
+        <div style="background:#fff;border:1.5px solid #f59f00;border-radius:10px;padding:18px 20px;margin-bottom:12px;box-shadow:0 0 0 3px rgba(245,159,0,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="background:#f59f00;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">② 复制</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;">密钥（KEY）</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入 V2Board「KEY」字段</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:10px 14px;font-size:.9rem;color:#9ca3af;border:1px solid #e5e7eb;letter-spacing:3px;">
+              ••••••••••••••••••••••••••••••••••
+            </div>
+            <button style="padding:8px 12px;background:#fff;border:1px solid #d1d5db;border-radius:6px;font-size:.78rem;color:#374151;cursor:pointer;">显示</button>
+            <button style="padding:8px 16px;background:#f59f00;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:600;">复制</button>
+          </div>
+        </div>
+
+        <!-- ③ 网关 -->
+        <div style="background:#fff;border:1.5px solid #a855f7;border-radius:10px;padding:18px 20px;box-shadow:0 0 0 3px rgba(168,85,247,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="background:#a855f7;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">③ 记录</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;">网关地址（URL）</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入 V2Board「URL」字段</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#374151;border:1px solid #e5e7eb;">
+              https://api2.188pay.top
+            </div>
+            <button style="padding:8px 16px;background:#a855f7;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;font-weight:600;">复制</button>
+          </div>
+          <div style="font-size:.68rem;color:#9ca3af;margin-top:8px;">V2Board EPay 驱动会自动拼接 /submit.php，URL 字段<strong style="color:#7c3aed;"> 不要带 /submit.php，也不要有末尾斜杠</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note green" style="margin-top:14px;">
+      <div class="info-note-icon">🔗</div>
+      <div>直接访问
+        <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener"
+           style="color:#86efac;font-family:monospace;font-size:.82rem;text-decoration:underline;">www.188pay.top/dashboard/api-keys</a>
+        复制<strong style="color:var(--text);"> 商户ID（PID）和密钥（KEY）</strong>，后续步骤填写 V2Board 时需要用到。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1 ── 配置站点网址 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s1">01</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第一步（重要前提）</div>
+        <div class="step-title">确认「系统配置」→ 站点网址<span>回调地址依赖此配置，必须正确</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-v2board.com/admin#/setting</div>
+      </div>
+      <div class="v2-admin" style="min-height:340px;">
+        <div class="v2-sidebar">
+          <div class="v2-logo"><div class="v2-logo-text">V2Board</div></div>
+          <div class="v2-nav">
+            <div class="v2-nav-item"><span class="ni">📊</span> 仪表盘</div>
+            <div class="v2-nav-section">设置</div>
+            <!-- 高亮当前页 -->
+            <div class="v2-nav-item active" style="position:relative;">
+              <span class="ni">⚙️</span> 系统配置
+              <span style="position:absolute;right:8px;background:rgba(255,255,255,.25);border-radius:4px;padding:1px 6px;font-size:.6rem;font-weight:700;">← 点这里</span>
+            </div>
+            <div class="v2-nav-item"><span class="ni">💳</span> 支付配置</div>
+            <div class="v2-nav-item"><span class="ni">🎨</span> 主题配置</div>
+            <div class="v2-nav-section">服务器</div>
+            <div class="v2-nav-item"><span class="ni">🖥</span> 节点管理</div>
+            <div class="v2-nav-item"><span class="ni">🔑</span> 权限组管理</div>
+            <div class="v2-nav-section">财务</div>
+            <div class="v2-nav-item"><span class="ni">📦</span> 订阅管理</div>
+            <div class="v2-nav-item"><span class="ni">📋</span> 订单管理</div>
+          </div>
+        </div>
+        <div class="v2-content">
+          <div class="v2-topbar">
+            <div class="v2-topbar-title">系统配置</div>
+            <div class="v2-topbar-right"><div class="v2-user">⚙️ <span>admin@token188.top</span></div></div>
+          </div>
+          <div class="v2-config-page" style="padding-top:16px;">
+            <!-- Tabs -->
+            <div class="v2-config-tabs">
+              <div class="v2-config-tab active" style="display:flex;align-items:center;gap:6px;">
+                站点
+                <span style="background:#ef4444;color:#fff;border-radius:4px;padding:1px 6px;font-size:.6rem;font-weight:700;">← 在这个 Tab</span>
+              </div>
+              <div class="v2-config-tab">安全</div>
+              <div class="v2-config-tab">订阅</div>
+              <div class="v2-config-tab">邀请&佣金</div>
+              <div class="v2-config-tab">个性化</div>
+              <div class="v2-config-tab">节点</div>
+              <div class="v2-config-tab">邮件</div>
+            </div>
+
+            <!-- 关键配置行 -->
+            <div class="v2-config-row">
+              <div>
+                <div class="v2-config-key">站点名称</div>
+                <div class="v2-config-desc">用于显示需要站点名称的地方</div>
+              </div>
+              <div class="v2-config-val">
+                <input class="v2-field-input" style="max-width:360px;" value="V2Board" readonly>
+              </div>
+            </div>
+
+            <div class="v2-config-row" style="background:rgba(239,68,68,.04);border-radius:6px;padding:14px;margin-bottom:4px;border:1.5px solid rgba(239,68,68,.35);">
+              <div>
+                <div class="v2-config-key" style="color:#dc2626;">站点网址 ⚠️</div>
+                <div class="v2-config-desc">当前网站最新网址，将会在邮件等需要用于网址处体现</div>
+                <div style="font-size:.68rem;color:#ef4444;margin-top:4px;font-weight:600;">必须先填写！回调地址依赖此值。填你的域名或 IP（末尾加 /）</div>
+              </div>
+              <div class="v2-config-val">
+                <input class="v2-field-input filled-blue" style="max-width:360px;" value="https://your-v2board.com/" readonly>
+              </div>
+            </div>
+
+            <div class="v2-config-row">
+              <div>
+                <div class="v2-config-key">强制 HTTPS</div>
+                <div class="v2-config-desc">当站点没有使用 HTTPS、CDN 或反代开启强制 HTTPS 时需要开启</div>
+              </div>
+              <div class="v2-config-val">
+                <div style="width:36px;height:20px;background:#e5e7eb;border-radius:99px;padding:2px;display:flex;align-items:center;">
+                  <div style="width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note warn" style="margin-top:14px;">
+      <div class="info-note-icon">⚠️</div>
+      <div>
+        <strong style="color:var(--text);">站点网址决定回调地址。</strong>
+        如果填错或留空，188pay 无法将支付成功通知发回 V2Board，订单将无法自动完成。
+        填写格式：<code style="font-family:monospace;font-size:.82rem;color:#fbbf24;">https://your-domain.com/</code>（末尾带斜杠）。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── 进入支付配置，添加 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s2">02</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第二步</div>
+        <div class="step-title">进入「支付配置」，点击添加<span>左侧菜单 → 设置 → 支付配置</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-v2board.com/admin#/payment</div>
+      </div>
+      <div class="v2-admin" style="min-height:300px;">
+        <div class="v2-sidebar">
+          <div class="v2-logo"><div class="v2-logo-text">V2Board</div></div>
+          <div class="v2-nav">
+            <div class="v2-nav-item"><span class="ni">📊</span> 仪表盘</div>
+            <div class="v2-nav-section">设置</div>
+            <div class="v2-nav-item"><span class="ni">⚙️</span> 系统配置</div>
+            <div class="v2-nav-item active" style="position:relative;">
+              <span class="ni">💳</span> 支付配置
+              <span style="position:absolute;right:8px;background:rgba(255,255,255,.25);border-radius:4px;padding:1px 6px;font-size:.6rem;font-weight:700;">← 点这里</span>
+            </div>
+            <div class="v2-nav-item"><span class="ni">🎨</span> 主题配置</div>
+            <div class="v2-nav-section">服务器</div>
+            <div class="v2-nav-item"><span class="ni">🖥</span> 节点管理</div>
+            <div class="v2-nav-section">财务</div>
+            <div class="v2-nav-item"><span class="ni">📋</span> 订单管理</div>
+          </div>
+        </div>
+        <div class="v2-content">
+          <div class="v2-topbar">
+            <div class="v2-topbar-title">支付配置</div>
+            <div class="v2-topbar-right"><div class="v2-user">⚙️ <span>admin@token188.top</span></div></div>
+          </div>
+          <div class="v2-page">
+            <!-- 添加按钮 -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div class="v2-btn v2-btn-primary" style="position:relative;">
+                + 添加支付方式
+                <span style="position:absolute;top:-10px;right:-10px;background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:.6rem;font-weight:800;white-space:nowrap;">← 点这里</span>
+              </div>
+            </div>
+
+            <div class="v2-card">
+              <table class="v2-table">
+                <tr>
+                  <th>ID</th><th>启用</th><th>显示名称</th><th>支付接口</th><th>通知地址</th><th>操作</th>
+                </tr>
+                <tr style="background:#eff6ff;">
+                  <td><span style="font-size:.75rem;color:#6b7280;">≡ 1</span></td>
+                  <td><div class="v2-toggle-on"></div></td>
+                  <td style="font-weight:600;color:#1e40af;">188pay</td>
+                  <td><span style="font-size:.75rem;">EPay</span></td>
+                  <td><span class="v2-mono" style="max-width:320px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                    https://your-v2board.com/api/v1/guest/payment/notify/EPay/vLQevtlD
+                  </span></td>
+                  <td>
+                    <span class="v2-action-link">编辑</span>
+                    <span class="v2-action-link danger">删除</span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note" style="margin-top:14px;">
+      <div class="info-note-icon">💡</div>
+      <div>
+        如果之前已经添加过 188pay，直接点「编辑」即可修改配置，不需要重新添加。
+        「通知地址」是 188pay 回调到 V2Board 的地址，V2Board 自动生成，无需手动填写。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── 填写配置 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s3">03</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第三步</div>
+        <div class="step-title">填写 188pay 配置信息<span>选 EPay 接口，填入 URL / PID / KEY</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-v2board.com/admin#/payment</div>
+      </div>
+      <!-- 整个 admin + 弹窗 -->
+      <div class="v2-admin" style="min-height:1020px;position:relative;">
+        <div class="v2-sidebar">
+          <div class="v2-logo"><div class="v2-logo-text">V2Board</div></div>
+          <div class="v2-nav">
+            <div class="v2-nav-item"><span class="ni">📊</span> 仪表盘</div>
+            <div class="v2-nav-section">设置</div>
+            <div class="v2-nav-item"><span class="ni">⚙️</span> 系统配置</div>
+            <div class="v2-nav-item active"><span class="ni">💳</span> 支付配置</div>
+            <div class="v2-nav-item"><span class="ni">🎨</span> 主题配置</div>
+            <div class="v2-nav-section">服务器</div>
+            <div class="v2-nav-item"><span class="ni">🖥</span> 节点管理</div>
+            <div class="v2-nav-item"><span class="ni">🔑</span> 权限组管理</div>
+            <div class="v2-nav-section">财务</div>
+            <div class="v2-nav-item"><span class="ni">📋</span> 订单管理</div>
+            <div class="v2-nav-section">用户</div>
+            <div class="v2-nav-item"><span class="ni">👤</span> 用户管理</div>
+            <div class="v2-nav-item"><span class="ni">📢</span> 公告管理</div>
+          </div>
+        </div>
+        <div class="v2-content" style="filter:blur(1.5px) brightness(.7);pointer-events:none;">
+          <div class="v2-topbar">
+            <div class="v2-topbar-title">支付配置</div>
+          </div>
+          <div class="v2-page">
+            <div class="v2-btn v2-btn-primary" style="margin-bottom:14px;">+ 添加支付方式</div>
+            <div class="v2-card">
+              <table class="v2-table">
+                <tr><th>ID</th><th>启用</th><th>显示名称</th><th>支付接口</th><th>通知地址</th><th>操作</th></tr>
+                <tr>
+                  <td>≡ 1</td><td><div class="v2-toggle-on"></div></td>
+                  <td>188pay</td><td>EPay</td>
+                  <td class="v2-mono">…/notify/EPay/vLQevtlD</td>
+                  <td><span class="v2-action-link">编辑</span></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal overlay -->
+        <div class="v2-modal-overlay">
+          <div class="v2-modal">
+            <div class="v2-modal-header">
+              <div class="v2-modal-title">编辑支付方式</div>
+              <div class="v2-modal-close">✕</div>
+            </div>
+            <div class="v2-modal-body">
+
+              <!-- 显示名称 -->
+              <div class="v2-field">
+                <div class="v2-field-label">显示名称</div>
+                <input class="v2-field-input filled-blue" value="188pay" readonly>
+                <div style="font-size:.68rem;color:#6b7280;margin-top:4px;">前台用户看到的支付方式名称，可自定义</div>
+              </div>
+
+              <!-- 图标URL -->
+              <div class="v2-field">
+                <div class="v2-field-label">图标 URL <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（选填）</span></div>
+                <input class="v2-field-input" placeholder="用于前端显示使用(https://x.com/icon.svg)" readonly>
+              </div>
+
+              <!-- 自定义通知域名 -->
+              <div class="v2-field">
+                <div class="v2-field-label">自定义通知域名 <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（选填）</span></div>
+                <input class="v2-field-input" placeholder="网关的通知将会发送到该域名(https://x.com)" readonly>
+                <div style="font-size:.68rem;color:#6b7280;margin-top:4px;">留空则使用系统配置中的站点网址</div>
+              </div>
+
+              <!-- 手续费 -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="v2-field">
+                  <div class="v2-field-label">百分比手续费 <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（选填）</span></div>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <input class="v2-field-input" placeholder="在订单金额基础上附加手续费" style="flex:1;" readonly>
+                    <span style="font-size:.8rem;color:#6b7280;">%</span>
+                  </div>
+                </div>
+                <div class="v2-field">
+                  <div class="v2-field-label">固定手续费 <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（选填）</span></div>
+                  <input class="v2-field-input" value="0" readonly>
+                </div>
+              </div>
+
+              <!-- 接口文件 — 重点 -->
+              <div class="v2-field">
+                <div class="v2-field-label" style="color:#dc2626;">接口文件 ①</div>
+                <div class="v2-field-select">
+                  <div>
+                    <span class="sel-label">EPay</span>
+                    <span style="color:#6b7280;font-size:.78rem;margin-left:6px;">易支付</span>
+                  </div>
+                  <span class="sel-hint">← 选择 EPAY</span>
+                </div>
+                <div style="font-size:.68rem;color:#dc2626;margin-top:4px;font-weight:600;">下拉菜单选择「EPay」，不要选其他驱动</div>
+              </div>
+
+              <!-- URL — 重点 -->
+              <div class="v2-field">
+                <div class="v2-field-label" style="color:#dc2626;">URL ②</div>
+                <input class="v2-field-input filled-purple" value="https://api2.188pay.top" readonly>
+                <div style="font-size:.68rem;margin-top:4px;color:#6b7280;">
+                  <span style="color:#ef4444;font-weight:700;">⚠ 不要加 /submit.php，也不要末尾斜杠</span>
+                  — EPay 驱动会自动拼接
+                </div>
+              </div>
+
+              <!-- PID — 重点 -->
+              <div class="v2-field">
+                <div class="v2-field-label" style="color:#dc2626;">PID ③ <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（即商户 ID）</span></div>
+                <input class="v2-field-input filled-blue" value="a1b2c3d4-e5f6-7890-abcd-ef1234567890" readonly>
+                <div style="font-size:.68rem;color:#6b7280;margin-top:4px;">从 188pay 商户中心「API 密钥」页面复制</div>
+              </div>
+
+              <!-- KEY — 重点 -->
+              <div class="v2-field">
+                <div class="v2-field-label" style="color:#dc2626;">KEY ④ <span style="font-size:.68rem;font-weight:400;color:#9ca3af;">（即商户密钥）</span></div>
+                <input class="v2-field-input filled-orange" value="AbCdEfGhIjKlMnOpQrStUvWxYz123456" readonly>
+                <div style="font-size:.68rem;color:#6b7280;margin-top:4px;">从 188pay 商户中心「API 密钥」页面复制</div>
+              </div>
+
+            </div>
+            <div class="v2-modal-footer">
+              <div class="v2-btn v2-btn-outline">取消</div>
+              <div class="v2-btn v2-btn-primary" style="background:#2563eb;">保存</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 字段说明卡片 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+      <div style="background:var(--surface);border:1px solid rgba(79,110,247,.4);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#93a8fb;margin-bottom:4px;">① 接口文件</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">下拉选择 <strong style="color:var(--text);">EPay</strong>（易支付），不要选 Stripe / PayPal 等其他驱动</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(168,85,247,.4);border-left:3px solid var(--step2);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#d8b4fe;margin-bottom:4px;">② URL（网关地址）</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">填 <code style="font-family:monospace;font-size:.75rem;color:#d8b4fe;">https://api2.188pay.top</code><br>
+          <strong style="color:#f87171;font-size:.72rem;">不带 /submit.php，不带末尾 /</strong></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(79,110,247,.4);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#93a8fb;margin-bottom:4px;">③ PID（商户 ID）</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">从 188pay 商户中心复制的<strong style="color:var(--text);">商户 ID</strong></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(245,159,0,.4);border-left:3px solid var(--warn);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">④ KEY（商户密钥）</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">从 188pay 商户中心复制的<strong style="color:var(--text);">商户密钥</strong>，不是网关地址</div>
+      </div>
+    </div>
+
+    <div class="info-note green" style="margin-top:12px;">
+      <div class="info-note-icon">✅</div>
+      <div>
+        保存后回到支付配置列表，确认启用开关已打开（蓝色）。用户下单时即可看到 188pay USDT 支付选项。
+        如果支付页面报错，请先检查<strong style="color:var(--text);"> URL 是否带了多余的路径或斜杠</strong>，或联系
+        <a href="https://t.me/token188" style="color:#86efac;">@token188</a> 获取帮助。
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4 ── 完成确认 -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s4">04</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第四步</div>
+        <div class="step-title">确认启用，完成接入<span>列表中开关打开即生效</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-v2board.com/admin#/payment</div>
+      </div>
+      <div class="v2-admin" style="min-height:200px;">
+        <div class="v2-sidebar">
+          <div class="v2-logo"><div class="v2-logo-text">V2Board</div></div>
+          <div class="v2-nav">
+            <div class="v2-nav-item"><span class="ni">📊</span> 仪表盘</div>
+            <div class="v2-nav-section">设置</div>
+            <div class="v2-nav-item"><span class="ni">⚙️</span> 系统配置</div>
+            <div class="v2-nav-item active"><span class="ni">💳</span> 支付配置</div>
+            <div class="v2-nav-item"><span class="ni">🎨</span> 主题配置</div>
+          </div>
+        </div>
+        <div class="v2-content">
+          <div class="v2-topbar">
+            <div class="v2-topbar-title">支付配置</div>
+          </div>
+          <div class="v2-page">
+            <div style="margin-bottom:12px;"><div class="v2-btn v2-btn-primary">+ 添加支付方式</div></div>
+            <div class="v2-card">
+              <table class="v2-table">
+                <tr><th>ID</th><th>启用</th><th>显示名称</th><th>支付接口</th><th>通知地址 ⓘ</th><th>操作</th></tr>
+                <tr style="background:#f0fdf4;">
+                  <td style="font-size:.75rem;color:#6b7280;">≡ 1</td>
+                  <td>
+                    <div style="position:relative;display:inline-block;">
+                      <div class="v2-toggle-on"></div>
+                      <span style="position:absolute;top:-12px;left:-4px;background:#22c55e;color:#fff;border-radius:4px;padding:1px 6px;font-size:.58rem;font-weight:800;white-space:nowrap;">已启用 ✓</span>
+                    </div>
+                  </td>
+                  <td style="font-weight:700;color:#16a34a;">188pay</td>
+                  <td><span style="background:#dbeafe;color:#2563eb;border-radius:4px;padding:2px 8px;font-size:.72rem;font-weight:600;">EPay</span></td>
+                  <td>
+                    <span class="v2-mono" style="font-size:.65rem;color:#16a34a;">
+                      https://your-v2board.com/api/v1/guest/payment/notify/EPay/vLQevtlD
+                    </span>
+                  </td>
+                  <td>
+                    <span class="v2-action-link">编辑</span>
+                    <span class="v2-action-link danger">删除</span>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note green" style="margin-top:14px;">
+      <div class="info-note-icon">🎉</div>
+      <div>
+        配置完成！用户在订单结算页会看到 188pay 支付选项，付款后 V2Board 自动收到回调并完成订单。
+        「通知地址」列显示的 URL 就是 V2Board 生成的回调地址，188pay 会自动向该地址发送支付结果通知，无需手动填写。
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /step-flow -->
+
+  <!-- 参数速查 -->
+  <div class="section-header"><h2>参数速查</h2></div>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-label">显示名称（可自定义）</div>
+      <div class="summary-card-val">188pay</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">接口文件（必须选此项）</div>
+      <div class="summary-card-val green">EPay</div>
+    </div>
+    <div class="summary-card full">
+      <div class="summary-card-label">URL（网关地址）— 不带 /submit.php，不带末尾斜杠</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <span style="font-size:.65rem;background:var(--accent-light);color:var(--accent);border-radius:4px;padding:2px 7px;font-weight:700;">推荐</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent);">https://api2.188pay.top</span>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">PID（即商户 ID）</div>
+      <div class="summary-card-val">从 188pay 商户中心复制</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">KEY（即商户密钥）</div>
+      <div class="summary-card-val">从 188pay 商户中心复制</div>
+    </div>
+  </div>
+
+  <!-- Q&A -->
+  <div class="section-header" style="margin-top:40px;"><h2>常见问题</h2></div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ URL 应该填什么？要加 /submit.php 吗？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">V2Board 的 EPay 驱动会自动在 URL 后拼接 <code style="font-family:monospace;color:var(--accent);">/submit.php</code>，所以填 <code style="font-family:monospace;color:var(--accent);">https://api2.188pay.top</code> 即可，不需要手动加 /submit.php，也不要加末尾斜杠。</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 支付成功了，但订单还是待支付状态？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">检查「系统配置 → 站点网址」是否填了正确的公网域名或 IP，并且 V2Board 可以被公网访问。本地或内网环境无法收到 188pay 的支付回调。回调地址在支付配置列表的「通知地址」列可以查看。</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 支付页面提示「签名错误」？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">请检查 PID 和 KEY 是否从 188pay 完整复制，粘贴时不要包含多余的空格或换行符。也可以尝试重新生成密钥后再填一次。</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 用户看不到 188pay 支付选项？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">确认支付配置列表中 188pay 的启用开关已打开（蓝色状态）。另外检查该支付方式对应的订阅套餐是否有关联的支付配置限制。</div>
+    </div>
+  </div>
+
+  <!-- 错误排查 -->
+  <div class="section-header" style="margin-top:40px;"><h2>错误排查</h2></div>
+
+  <div style="background:rgba(245,159,0,.08);border:1px solid rgba(245,159,0,.35);border-left:3px solid var(--warn);border-radius:10px;padding:18px 20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid var(--warn);font-size:.72rem;font-weight:700;color:var(--warn);flex-shrink:0;">!</span>
+      <span style="font-weight:700;font-size:.9rem;color:#fbbf24;">常见错误排查：</span>
+    </div>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:9px;padding:0;">
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">URL 格式错误：</strong>只填 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">https://api2.188pay.top</code>，不要加 <code style="font-family:monospace;">/submit.php</code>，也不要末尾斜杠。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">站点网址未配置：</strong>「系统配置 → 站点网址」必须是可公网访问的真实域名或 IP，否则 188pay 无法回调。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">接口文件选错：</strong>请确认下拉选了「EPay」，而不是其他驱动（Stripe、PayPal 等协议不兼容）。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">收款地址未配置：</strong>在 188pay 商户中心确认已添加 USDT（TRC20）或 TRX 收款地址，并已启用对应币种。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">PID / KEY 带有空格：</strong>复制时可能夹带多余空格，粘贴后仔细检查首尾是否干净。</span>
+      </li>
+    </ul>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(245,159,0,.2);font-size:.78rem;color:var(--text-muted);">
+      仍无法解决？联系 <a href="https://t.me/token188" style="color:var(--warn);text-decoration:none;font-weight:600;">Telegram @token188</a> 获取支持
+    </div>
+  </div>
+
+  <div class="footer">
+    188pay USDT 支付网关 &nbsp;·&nbsp; <a href="https://www.188pay.top">188pay.top</a> &nbsp;·&nbsp; Telegram: <a href="https://t.me/token188">@token188</a> &nbsp;·&nbsp; 频道: <a href="https://t.me/token188pay">@token188pay</a> &nbsp;·&nbsp; 公开群: <a href="https://t.me/coinpaybest">@coinpaybest</a>
+  </div>
+
+</div>
+</body>
+</html>

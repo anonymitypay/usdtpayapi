@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>独角数卡接入 188pay 易支付 — 配置教程</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c0e14;
+  --surface: #13161f;
+  --surface2: #1a1d28;
+  --border: #272b3a;
+  --border2: #323649;
+  --text: #e8eaf0;
+  --text-soft: #8b91a8;
+  --text-muted: #565c75;
+  --accent: #4f6ef7;
+  --accent-glow: rgba(79,110,247,.18);
+  --accent-light: rgba(79,110,247,.12);
+  --green: #22c55e;
+  --green-glow: rgba(34,197,94,.15);
+  --red: #ef4444;
+  --red-light: rgba(239,68,68,.12);
+  --warn: #f59f00;
+  --warn-light: rgba(245,159,0,.1);
+  --step1: #4f6ef7;
+  --step2: #a855f7;
+  --step3: #06b6d4;
+  --step4: #22c55e;
+
+  /* Dujiao UI colors */
+  --dj-sidebar: #1e3a8a;
+  --dj-sidebar-active: #2563eb;
+  --dj-sidebar-text: rgba(255,255,255,.75);
+  --dj-bg: #f8fafc;
+  --dj-white: #ffffff;
+  --dj-border: #e2e8f0;
+  --dj-text: #1e293b;
+  --dj-text-soft: #64748b;
+  --dj-header: #ffffff;
+}
+
+html { font-size: 15px; scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  padding: 64px 24px 56px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(79,110,247,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168,85,247,.08) 0%, transparent 60%);
+}
+.hero-inner { position: relative; max-width: 680px; margin: 0 auto; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent-light);
+  border: 1px solid rgba(79,110,247,.3);
+  border-radius: 999px;
+  padding: 5px 16px;
+  font-size: .75rem;
+  color: #93a8fb;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.hero h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.5px;
+  margin-bottom: 14px;
+}
+.hero h1 .brand { color: var(--accent); }
+.hero h1 .x { color: var(--text-muted); margin: 0 8px; font-weight: 300; }
+.hero-sub { color: var(--text-soft); font-size: .95rem; margin-bottom: 32px; line-height: 1.7; }
+.hero-chips { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.chip {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: .78rem;
+  color: var(--text-soft);
+}
+.chip strong { color: var(--text); }
+
+/* ── WRAPPER ── */
+.wrapper { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* ── VERSION NOTICE BANNER ── */
+.version-notice {
+  display: flex;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(245,159,0,.14) 0%, rgba(239,68,68,.08) 100%);
+  border: 1.5px solid rgba(245,159,0,.5);
+  border-left: 4px solid var(--warn);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 32px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+.version-notice::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, var(--warn), transparent);
+}
+.version-notice-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+  filter: drop-shadow(0 0 8px rgba(245,159,0,.5));
+}
+.version-notice-body {}
+.version-notice-title {
+  font-size: .82rem;
+  font-weight: 800;
+  color: var(--warn);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.version-notice-text {
+  font-size: .9rem;
+  color: #e8c87a;
+  line-height: 1.65;
+}
+.version-notice-text strong { color: #fbbf24; font-weight: 700; }
+
+/* ── PREREQ ── */
+.prereq {
+  display: flex; gap: 14px;
+  background: var(--warn-light);
+  border: 1px solid rgba(245,159,0,.25);
+  border-left: 3px solid var(--warn);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 40px 0;
+}
+.prereq-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.prereq h3 { font-size: .75rem; font-weight: 700; color: var(--warn); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 6px; }
+.prereq ul { list-style: none; }
+.prereq li { font-size: .85rem; color: #d4a820; padding: 2px 0; }
+.prereq li::before { content: '·'; margin-right: 6px; font-weight: 700; }
+
+/* ── STEP FLOW ── */
+.step-flow { display: flex; flex-direction: column; gap: 48px; margin-top: 16px; }
+
+.step-block { position: relative; }
+.step-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.step-badge {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.step-badge.s1 { background: rgba(79,110,247,.15); color: var(--step1); border: 1px solid rgba(79,110,247,.3); }
+.step-badge.s2 { background: rgba(168,85,247,.15); color: var(--step2); border: 1px solid rgba(168,85,247,.3); }
+.step-badge.s3 { background: rgba(6,182,212,.15); color: var(--step3); border: 1px solid rgba(6,182,212,.3); }
+.step-badge.s4 { background: rgba(34,197,94,.15); color: var(--step4); border: 1px solid rgba(34,197,94,.3); }
+.step-title-block {}
+.step-num-label { font-size: .72rem; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.step-title { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+.step-title span { opacity: .6; font-weight: 400; font-size: .95rem; margin-left: 8px; }
+
+/* ── UI FRAME ── */
+.ui-frame {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.04) inset;
+  position: relative;
+}
+.frame-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.frame-dots { display: flex; gap: 6px; }
+.fd { width: 11px; height: 11px; border-radius: 50%; }
+.fd-r { background: #ff5f57; }
+.fd-y { background: #febc2e; }
+.fd-g { background: #28c840; }
+.frame-url {
+  flex: 1; background: rgba(255,255,255,.05); border: 1px solid var(--border2);
+  border-radius: 5px; padding: 4px 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--text-muted);
+}
+.frame-lock { font-size: .75rem; color: var(--green); margin-right: 4px; }
+
+/* ── DUJIAO ADMIN UI ── */
+.dj-admin { display: flex; min-height: 400px; background: var(--dj-bg); }
+
+/* Sidebar */
+.dj-sidebar {
+  width: 192px; flex-shrink: 0;
+  background: var(--dj-sidebar);
+  display: flex; flex-direction: column;
+}
+.dj-logo {
+  padding: 18px 16px 14px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.dj-logo-icon {
+  width: 32px; height: 32px; background: #fff;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.dj-logo-text { font-size: .9rem; font-weight: 700; color: #fff; font-family: 'Noto Sans SC', sans-serif; }
+.dj-nav { padding: 10px 0; flex: 1; }
+.dj-nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 16px;
+  font-size: .78rem; color: var(--dj-sidebar-text);
+  cursor: pointer; transition: background .1s;
+}
+.dj-nav-item:hover { background: rgba(255,255,255,.08); }
+.dj-nav-item.active {
+  background: var(--dj-sidebar-active);
+  color: #fff; font-weight: 600;
+}
+.dj-nav-item .ni { font-size: .82rem; opacity: .85; }
+.dj-nav-sub {
+  padding: 0;
+  font-size: .75rem; color: rgba(255,255,255,.5);
+  padding-left: 38px;
+}
+.dj-nav-sub-item { padding: 6px 16px 6px 0; cursor: pointer; }
+.dj-nav-sub-item:hover { color: #fff; }
+.dj-nav-sub-item.active { color: #93c5fd; font-weight: 600; }
+.dj-topbar {
+  background: var(--dj-header);
+  border-bottom: 1px solid var(--dj-border);
+  height: 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+.dj-topbar-left { font-size: .8rem; color: var(--dj-text-soft); }
+.dj-topbar-right { display: flex; align-items: center; gap: 12px; font-size: .78rem; color: var(--dj-text-soft); }
+.dj-user-badge {
+  display: flex; align-items: center; gap: 6px;
+}
+.dj-user-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+.dj-power { width: 28px; height: 28px; border-radius: 50%; background: #2563eb; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .7rem; }
+
+/* Main content */
+.dj-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.dj-page { flex: 1; padding: 16px 20px; overflow: auto; }
+.dj-page-title { font-size: .9rem; font-weight: 700; color: var(--dj-text); margin-bottom: 14px; }
+
+/* Table */
+.dj-table-wrap { background: #fff; border-radius: 8px; border: 1px solid var(--dj-border); overflow: hidden; }
+.dj-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+.dj-table th {
+  background: #f8fafc; padding: 8px 10px;
+  font-size: .68rem; font-weight: 600; color: var(--dj-text-soft);
+  text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--dj-border);
+}
+.dj-table td {
+  padding: 8px 10px; color: var(--dj-text);
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle; white-space: nowrap;
+}
+.dj-table tr:last-child td { border-bottom: none; }
+/* highlighted rows — 完全内嵌样式，不依赖浮动标注 */
+.dj-table tr.highlighted td { background: rgba(239,68,68,.05); }
+.dj-table tr.highlighted td:first-child { box-shadow: inset 3px 0 0 #ef4444; }
+.dj-badge-jump {
+  display: inline-block; background: #dbeafe; color: #2563eb;
+  border-radius: 4px; padding: 1px 6px; font-size: .65rem; font-weight: 600;
+}
+.dj-toggle-on {
+  display: inline-flex; align-items: center; justify-content: flex-end;
+  width: 32px; height: 18px; background: #2563eb; border-radius: 99px; padding: 2px;
+}
+.dj-toggle-on::after { content: ''; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.dj-toggle-off {
+  display: inline-flex; align-items: center;
+  width: 32px; height: 18px; background: #cbd5e1; border-radius: 99px; padding: 2px;
+}
+.dj-toggle-off::after { content: ''; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.dj-dots { color: #94a3b8; font-size: 1rem; cursor: pointer; }
+.dj-route { font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: #475569; }
+.dj-id-text { font-family: 'JetBrains Mono', monospace; font-size: .62rem; color: #64748b; max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+.dj-id-text.blue { color: #2563eb; }
+.dj-device { font-size: .65rem; background: #f1f5f9; border-radius: 3px; padding: 1px 6px; color: #64748b; }
+
+/* ── ANNOTATIONS ── */
+.annotated { position: relative; }
+
+/* Callout box */
+.callout-box {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: .75rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  z-index: 10;
+  pointer-events: none;
+}
+.callout-box.blue { border-color: rgba(79,110,247,.5); background: rgba(79,110,247,.1); color: #93a8fb; }
+.callout-box.purple { border-color: rgba(168,85,247,.5); background: rgba(168,85,247,.1); color: #d8b4fe; }
+.callout-box.red { border-color: rgba(239,68,68,.5); background: rgba(239,68,68,.1); color: #fca5a5; }
+.callout-box.green { border-color: rgba(34,197,94,.4); background: rgba(34,197,94,.1); color: #86efac; }
+.callout-box strong { font-weight: 700; }
+
+/* Highlight ring */
+.ring {
+  position: absolute;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+.ring.blue { border: 2px solid rgba(79,110,247,.8); box-shadow: 0 0 0 3px rgba(79,110,247,.2); }
+.ring.red { border: 2px solid rgba(239,68,68,.9); box-shadow: 0 0 0 3px rgba(239,68,68,.25); animation: ring-pulse 2s ease-in-out infinite; }
+.ring.green { border: 2px solid rgba(34,197,94,.8); box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+@keyframes ring-pulse { 0%,100%{box-shadow:0 0 0 3px rgba(239,68,68,.25)} 50%{box-shadow:0 0 0 6px rgba(239,68,68,.1)} }
+
+/* SVG annotation layer */
+.anno-svg { position: absolute; inset: 0; pointer-events: none; z-index: 8; }
+
+/* Step arrow */
+.step-connector {
+  display: flex; justify-content: center;
+  color: var(--text-muted); font-size: 1.2rem;
+  margin: -24px 0;
+}
+
+/* ── INFO CALLOUT ── */
+.info-note {
+  display: flex; gap: 10px;
+  background: var(--accent-light);
+  border: 1px solid rgba(79,110,247,.25);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 14px;
+  font-size: .83rem; color: #93a8fb;
+}
+.info-note.green {
+  background: var(--green-glow);
+  border-color: rgba(34,197,94,.25);
+  border-left-color: var(--green);
+  color: #86efac;
+}
+.info-note-icon { flex-shrink: 0; }
+
+/* ── FORM MOCK ── */
+.dj-form { background: #fff; }
+.dj-form-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; border-bottom: 1px solid #f1f5f9; }
+.dj-form-label { padding: 10px 14px; font-size: .75rem; color: #64748b; font-weight: 500; background: #f8fafc; border-right: 1px solid #f1f5f9; }
+.dj-form-val { padding: 8px 12px; font-size: .78rem; color: var(--dj-text); }
+.dj-form-val.filled { background: #eff6ff; }
+.dj-form-val.filled-green { background: #f0fdf4; }
+.dj-form-val.mono { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: #2563eb; }
+.dj-form-val.mono-green { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: #16a34a; }
+.dj-form-input {
+  display: flex; align-items: center;
+  border: 1.5px solid #2563eb;
+  border-radius: 5px; padding: 5px 10px;
+  font-size: .75rem;
+  background: #eff6ff; color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  width: 100%;
+}
+.dj-form-input.highlight { border-color: #f59f00; background: #fffbeb; color: #92400e; box-shadow: 0 0 0 3px rgba(245,159,0,.08); }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  margin: 48px 0 24px;
+}
+.section-header h2 { font-size: .8rem; font-weight: 700; color: var(--text-muted); letter-spacing: .8px; text-transform: uppercase; }
+.section-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── SUMMARY ── */
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.summary-card-label { font-size: .7rem; color: var(--text-muted); letter-spacing: .4px; text-transform: uppercase; margin-bottom: 6px; }
+.summary-card-val { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--accent); word-break: break-all; }
+.summary-card-val.green { color: var(--green); }
+.summary-card.full { grid-column: 1 / -1; }
+
+/* ── FOOTER ── */
+.footer { text-align: center; padding: 40px 0 24px; font-size: .78rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 60px; }
+.footer a { color: var(--accent); text-decoration: none; }
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 1.8rem; }
+  .summary-grid { grid-template-columns: 1fr; }
+  .dj-sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><div class="hero-tag-dot"></div>图文配置教程 · 3步完成</div>
+    <h1>
+      <span style="color:var(--text-soft);font-weight:400;font-size:1.8rem;">独角数卡</span>
+      <span class="x">×</span>
+      <span class="brand">188pay</span><br>
+      易支付接入指南
+    </h1>
+    <p class="hero-sub">
+      找到独角已有的易支付配置，直接修改商户信息即可<br>
+      无需新建，无需安装插件，款项直达你的 USDT 钱包
+    </p>
+    <div class="hero-chips">
+      <div class="chip"><strong>独角数卡</strong> 1.x / 2.x</div>
+      <div class="chip"><strong>路由</strong> /pay/yipay</div>
+      <div class="chip"><strong>协议</strong> EPay 易支付</div>
+      <div class="chip"><strong>支持</strong> USDT-TRC20 · TRX</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- ⚠️ 版本提示横幅 -->
+  <div class="version-notice">
+    <div class="version-notice-icon">⚠️</div>
+    <div class="version-notice-body">
+      <div class="version-notice-title">注意 · 图示仅供参考</div>
+      <div class="version-notice-text">
+        本教程中的<strong>界面截图为示意图</strong>，展示的是配置流程的大概位置与步骤。
+        由于独角数卡版本迭代，<strong>实际界面样式、字段名称或菜单位置可能与图示有所不同</strong>，请以你实际使用的版本为准。
+        如遇到差异或配置问题，欢迎联系 <a href="https://t.me/token188" target="_blank" rel="noopener" style="color:#fbbf24;font-weight:700;text-decoration:underline;">Telegram @token188</a> 获取支持。
+      </div>
+    </div>
+  </div>
+
+  <div class="prereq">
+    <div class="prereq-icon">📋</div>
+    <div>
+      <h3>开始前准备</h3>
+      <ul>
+        <li>进入 <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener" style="color:#f59f00;text-decoration:underline;font-family:monospace;font-size:.82rem;">www.188pay.top/dashboard/api-keys</a> 复制商户ID、密钥和网关地址</li>
+        <li>用管理员账号登录独角数卡后台</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step-flow">
+
+  <!-- ───────────── STEP 0 ───────────── -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s1">00</div>
+      <div class="step-title-block">
+        <div class="step-num-label">准备工作</div>
+        <div class="step-title">获取 188pay 商户凭证<span>商户ID + 密钥，填写独角时需要用到</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener"
+           class="frame-url" style="color:#86efac;text-decoration:none;cursor:pointer;"
+           onmouseover="this.style.color='#22c55e'" onmouseout="this.style.color='#86efac'">
+          <span class="frame-lock">🔒</span>www.188pay.top/dashboard/api-keys
+          <span style="margin-left:6px;font-size:.65rem;opacity:.6;">↗ 点击直达</span>
+        </a>
+      </div>
+      <!-- 188pay API Keys 页面还原 —— 无浮动气泡，编号直接嵌入每个卡片标题 -->
+      <div style="background:#f5f5f5;padding:28px 32px 24px;">
+        <div style="font-size:1.4rem;font-weight:700;color:#111;margin-bottom:20px;font-family:'Noto Sans SC',sans-serif;">API 密钥</div>
+
+        <!-- ① 商户ID卡片 -->
+        <div style="background:#fff;border:1.5px solid #2563eb;border-radius:10px;padding:18px 20px;margin-bottom:12px;box-shadow:0 0 0 3px rgba(37,99,235,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="background:#2563eb;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">① 复制</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;font-family:'Noto Sans SC',sans-serif;">商户 ID</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入独角「商户 ID」字段</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#374151;border:1px solid #e5e7eb;">
+              620f22b6-56a8-4ac8-a5ff-a257bcb1d84b
+            </div>
+            <button style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;white-space:nowrap;font-weight:600;">复制</button>
+          </div>
+        </div>
+
+        <!-- ② 密钥卡片 -->
+        <div style="background:#fff;border:1.5px solid #f59f00;border-radius:10px;padding:18px 20px;margin-bottom:12px;box-shadow:0 0 0 3px rgba(245,159,0,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="background:#f59f00;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">② 复制</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;font-family:'Noto Sans SC',sans-serif;">密钥</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入独角「商户密钥」字段</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:10px 14px;font-size:.9rem;color:#9ca3af;border:1px solid #e5e7eb;letter-spacing:3px;">
+              ••••••••••••••••••••••••••••••••••
+            </div>
+            <button style="padding:8px 12px;background:#fff;border:1px solid #d1d5db;border-radius:6px;font-size:.78rem;color:#374151;cursor:pointer;white-space:nowrap;">显示</button>
+            <button style="padding:8px 16px;background:#f59f00;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;white-space:nowrap;font-weight:600;">复制</button>
+          </div>
+          <button style="padding:6px 14px;background:#fff;border:1px solid #fca5a5;color:#ef4444;border-radius:6px;font-size:.72rem;cursor:pointer;">重新生成密钥</button>
+        </div>
+
+        <!-- ③ 网关地址卡片 -->
+        <div style="background:#fff;border:1.5px solid #a855f7;border-radius:10px;padding:18px 20px;box-shadow:0 0 0 3px rgba(168,85,247,.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <span style="background:#a855f7;color:#fff;border-radius:5px;padding:2px 9px;font-size:.7rem;font-weight:800;">③ 复制</span>
+            <span style="font-size:.88rem;font-weight:700;color:#111;font-family:'Noto Sans SC',sans-serif;">网关地址</span>
+            <span style="font-size:.7rem;color:#64748b;margin-left:auto;">→ 填入独角「商户 KEY」字段</span>
+          </div>
+
+          <div style="margin-bottom:5px;font-size:.72rem;color:#7c3aed;font-weight:700;">EPay 网关（独角推荐填此项）</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#374151;border:1px solid #e5e7eb;">
+              https://api2.188pay.top/submit.php
+            </div>
+            <button style="padding:8px 16px;background:#a855f7;color:#fff;border:none;border-radius:6px;font-size:.78rem;cursor:pointer;white-space:nowrap;font-weight:600;">复制</button>
+          </div>
+          <div style="margin-bottom:5px;font-size:.72rem;color:#7c3aed;font-weight:700;">备用网关（若上方不行可尝试）</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;background:#f3f4f6;border-radius:6px;padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#374151;border:1px solid #e5e7eb;">
+              https://api2.188pay.top
+            </div>
+            <button style="padding:8px 16px;background:#fff;border:1px solid #d1d5db;border-radius:6px;font-size:.78rem;color:#374151;cursor:pointer;white-space:nowrap;">复制</button>
+          </div>
+          <div style="font-size:.68rem;color:#9ca3af;margin-top:8px;">两个地址都可以尝试，不同系统适配不同，如遇问题联系 @token188</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note green" style="margin-top:14px;">
+      <div class="info-note-icon">🔗</div>
+      <div>直接访问
+        <a href="https://www.188pay.top/dashboard/api-keys" target="_blank" rel="noopener"
+           style="color:#86efac;font-family:monospace;font-size:.82rem;text-decoration:underline;">www.188pay.top/dashboard/api-keys</a>
+        复制<strong style="color:var(--text);"> 商户ID、密钥和网关地址</strong>，Step 03 填写独角配置时需要用到。两个网关地址都可以尝试，不同系统可能适配不同的格式。
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── STEP 1 ───────────── -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s1">01</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第一步</div>
+        <div class="step-title">进入「支付配置」<span>左侧菜单 → 配置 → 支付配置</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-shop.com/admin/payment</div>
+      </div>
+      <!-- 无浮动标注：提示直接内嵌在侧边栏菜单项内 -->
+      <div class="dj-admin" style="min-height:240px;">
+        <div class="dj-sidebar">
+          <div class="dj-logo">
+            <div class="dj-logo-icon">🦊</div>
+            <div class="dj-logo-text">独角 数卡</div>
+          </div>
+          <div class="dj-nav">
+            <div class="dj-nav-item"><span class="ni">📊</span> 主页</div>
+            <div class="dj-nav-item"><span class="ni">🔧</span> 配置 <span style="margin-left:auto;font-size:.7rem;">∨</span></div>
+            <div class="dj-nav-sub">
+              <!-- active 菜单项内嵌"点这里"标签，不使用浮动定位 -->
+              <div class="dj-nav-sub-item active" style="display:flex;align-items:center;justify-content:space-between;padding-right:10px;color:#fff;font-weight:700;">
+                <span>支付配置</span>
+                <span style="background:rgba(255,255,255,.25);border-radius:4px;padding:1px 7px;font-size:.62rem;font-weight:700;letter-spacing:.3px;white-space:nowrap;">← 点这里</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dj-content">
+          <div class="dj-topbar">
+            <div class="dj-topbar-left">≡</div>
+            <div class="dj-topbar-right">
+              <span>🌙</span>
+              <div class="dj-user-badge"><div class="dj-user-dot"></div>Administrator</div>
+              <div class="dj-power">⏻</div>
+            </div>
+          </div>
+          <div class="dj-page">
+            <div class="dj-page-title">支付配置</div>
+            <div class="dj-table-wrap">
+              <table class="dj-table">
+                <tr><th></th><th>#</th><th>名称</th><th>类型</th><th>商户号</th><th>密钥/接口地址</th><th>支付路由</th></tr>
+                <tr>
+                  <td><input type="checkbox" disabled></td><td>7</td><td>Paysapi 微信</td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text">商户号</span></td><td><span class="dj-id-text">密钥</span></td>
+                  <td><span class="dj-route">/pay/paysapi</span></td>
+                </tr>
+                <tr style="background:#eff6ff;">
+                  <td><input type="checkbox" disabled></td><td>14</td><td style="font-weight:600;color:#1e40af;">188pay</td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text blue">eb763422-3cbe-4040-a...</span></td><td><span class="dj-id-text blue">api2.188pay.top/submit.php</span></td>
+                  <td><span class="dj-route" style="color:#2563eb;font-weight:600;">/pay/yipay</span></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── STEP 2 ───────────── -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s2">02</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第二步</div>
+        <div class="step-title">找到易支付配置行<span>名称含「易支付」或路由为 /pay/yipay</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-shop.com/admin/payment</div>
+      </div>
+      <!-- 无浮动标注：提示内嵌在表格行和单元格内，永远对齐 -->
+      <div class="dj-admin" style="min-height:380px;">
+        <div class="dj-sidebar">
+          <div class="dj-logo"><div class="dj-logo-icon">🦊</div><div class="dj-logo-text">独角 数卡</div></div>
+          <div class="dj-nav">
+            <div class="dj-nav-item"><span class="ni">📊</span> 主页</div>
+            <div class="dj-nav-item"><span class="ni">⚙️</span> 系统 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">🔧</span> 配置 <span style="margin-left:auto;font-size:.7rem;">∨</span></div>
+            <div class="dj-nav-sub">
+              <div class="dj-nav-sub-item active">支付配置</div>
+            </div>
+          </div>
+        </div>
+        <div class="dj-content">
+          <div class="dj-topbar"><div class="dj-topbar-left">≡</div><div class="dj-topbar-right"><span>🌙</span><div class="dj-user-badge"><div class="dj-user-dot"></div>Administrator</div><div class="dj-power">⏻</div></div></div>
+          <div class="dj-page">
+            <div class="dj-page-title">支付配置</div>
+
+            <!-- 提示条：内嵌于内容区，无需浮动定位 -->
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:8px 12px;margin-bottom:10px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.3);border-radius:6px;font-size:.73rem;color:#fca5a5;">
+              <span style="font-weight:700;color:#f87171;white-space:nowrap;">🔍 找以下特征之一：</span>
+              <span>① 名称含 <strong style="color:#ef4444;background:rgba(239,68,68,.15);border-radius:3px;padding:0 5px;">易支付</strong></span>
+              <span style="color:#64748b;">或</span>
+              <span>② 路由列显示 <code style="font-family:monospace;color:#ef4444;background:rgba(239,68,68,.1);border-radius:3px;padding:0 5px;">/pay/yipay</code></span>
+            </div>
+
+            <!-- 删除"标识、设备、状态、操作"列，保留核心列，让表格宽度合适 -->
+            <div class="dj-table-wrap">
+              <table class="dj-table">
+                <tr><th></th><th>#</th><th>名称</th><th>类型</th><th>商户号</th><th>密钥/接口地址</th><th>支付路由</th></tr>
+                <tr>
+                  <td><input type="checkbox" disabled></td><td>11</td><td>Payjs 微信扫码</td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text">商户号</span></td><td><span class="dj-id-text">密钥</span></td>
+                  <td><span class="dj-route">/pay/payjs</span></td>
+                </tr>
+                <tr style="background:#eff6ff;">
+                  <td><input type="checkbox" disabled></td><td>14</td><td style="font-weight:600;color:#1e40af;">188pay</td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text blue">eb763422-3cbe...</span></td><td><span class="dj-id-text blue">api2.188pay.top/...</span></td>
+                  <td><span class="dj-route" style="color:#2563eb;font-weight:600;">/pay/yipay</span></td>
+                </tr>
+
+                <!-- 高亮行：特征标签嵌入单元格，"特征②"放在路由文字下方，不撑宽列 -->
+                <tr class="highlighted">
+                  <td><input type="checkbox" disabled></td><td>15</td>
+                  <td>
+                    <span style="display:inline-flex;align-items:center;gap:5px;">
+                      <span style="background:#ef4444;color:#fff;border-radius:3px;padding:1px 5px;font-size:.6rem;font-weight:800;flex-shrink:0;">特征①</span>
+                      <span style="font-weight:700;color:#dc2626;">易支付微信</span>
+                    </span>
+                  </td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text">商户号</span></td><td><span class="dj-id-text">密钥</span></td>
+                  <td>
+                    <span style="display:flex;flex-direction:column;gap:2px;">
+                      <span class="dj-route" style="color:#dc2626;font-weight:700;">/pay/yipay</span>
+                      <span style="background:#ef4444;color:#fff;border-radius:3px;padding:1px 5px;font-size:.58rem;font-weight:800;width:fit-content;">特征②</span>
+                    </span>
+                  </td>
+                </tr>
+                <tr class="highlighted">
+                  <td><input type="checkbox" disabled></td><td>16</td>
+                  <td>
+                    <span style="display:inline-flex;align-items:center;gap:5px;">
+                      <span style="background:#ef4444;color:#fff;border-radius:3px;padding:1px 5px;font-size:.6rem;font-weight:800;flex-shrink:0;">特征①</span>
+                      <span style="font-weight:700;color:#dc2626;">易支付QQ钱包</span>
+                    </span>
+                  </td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text">商户号</span></td><td><span class="dj-id-text">密钥</span></td>
+                  <td>
+                    <span style="display:flex;flex-direction:column;gap:2px;">
+                      <span class="dj-route" style="color:#dc2626;font-weight:700;">/pay/yipay</span>
+                      <span style="background:#ef4444;color:#fff;border-radius:3px;padding:1px 5px;font-size:.58rem;font-weight:800;width:fit-content;">特征②</span>
+                    </span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><input type="checkbox" disabled></td><td>17</td><td>PayPal</td>
+                  <td><span class="dj-badge-jump">跳转</span></td><td><span class="dj-id-text">商户号</span></td><td><span class="dj-id-text">密钥</span></td>
+                  <td><span class="dj-route">/pay/paypal</span></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-note" style="margin-top:14px;">
+      <div class="info-note-icon">💡</div>
+      <div>
+        独角的「易支付」系列配置（微信、QQ、支付宝等）都走 <code style="font-family:monospace;">/pay/yipay</code> 路由，
+        选任意一个修改商户信息即可，也可以多个都改成 188pay，分别对应不同支付类型（usdt / trx）。
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────── STEP 3 ───────────── -->
+  <div class="step-block">
+    <div class="step-header">
+      <div class="step-badge s3">03</div>
+      <div class="step-title-block">
+        <div class="step-num-label">第三步</div>
+        <div class="step-title">点击编辑，填入 188pay 配置<span>商户ID、商户KEY（网关）、商户密钥</span></div>
+      </div>
+    </div>
+
+    <div class="ui-frame">
+      <div class="frame-bar">
+        <div class="frame-dots"><div class="fd fd-r"></div><div class="fd fd-y"></div><div class="fd fd-g"></div></div>
+        <div class="frame-url"><span class="frame-lock">🔒</span>your-shop.com/admin/payment/14/edit</div>
+      </div>
+      <!-- 完整还原真实截图：完整侧边栏 + 真实字段名 + 红框标注 -->
+      <div class="dj-admin" style="min-height:620px;">
+        <div class="dj-sidebar">
+          <div class="dj-logo"><div class="dj-logo-icon">🦊</div><div class="dj-logo-text">独角 数卡</div></div>
+          <div class="dj-nav">
+            <div class="dj-nav-item"><span class="ni">📊</span> 主页</div>
+            <div class="dj-nav-item"><span class="ni">⚙️</span> 系统 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">📈</span> 销售数据 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">📦</span> 商品管理 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">🔑</span> 卡密管理 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">🎁</span> 优惠管理 <span style="margin-left:auto;font-size:.7rem;">‹</span></div>
+            <div class="dj-nav-item"><span class="ni">🔧</span> 配置 <span style="margin-left:auto;font-size:.7rem;">∨</span></div>
+            <div class="dj-nav-sub">
+              <div class="dj-nav-sub-item">邮件模板配置</div>
+              <div class="dj-nav-sub-item active">支付配置</div>
+              <div class="dj-nav-sub-item">系统设置</div>
+              <div class="dj-nav-sub-item">邮件测试</div>
+            </div>
+          </div>
+        </div>
+        <div class="dj-content">
+          <div class="dj-topbar">
+            <div class="dj-topbar-left">≡</div>
+            <div class="dj-topbar-right">
+              <span>🌙</span>
+              <div class="dj-user-badge"><div class="dj-user-dot"></div>Administrator <span style="color:#22c55e;font-size:.65rem;margin-left:4px;">● 在线</span></div>
+              <div class="dj-power">⏻</div>
+            </div>
+          </div>
+          <div class="dj-page">
+            <!-- Page header with breadcrumb -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div>
+                <span style="font-size:.9rem;font-weight:700;color:#1e293b;">支付通道</span>
+                <span style="font-size:.78rem;color:#64748b;margin-left:6px;">编辑</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span style="font-size:.65rem;color:#94a3b8;">主页 / 支付通道 / 14 / 编辑</span>
+                <div style="padding:5px 12px;background:#2563eb;color:#fff;border-radius:6px;font-size:.7rem;font-weight:600;">≡ 列表</div>
+                <div style="padding:5px 12px;background:#fff;border:1px solid #e2e8f0;color:#374151;border-radius:6px;font-size:.7rem;">👁 查看</div>
+              </div>
+            </div>
+
+            <div class="dj-table-wrap dj-form">
+              <div style="padding:10px 16px 8px;background:#fff;border-bottom:1px solid #f1f5f9;font-size:.8rem;font-weight:700;color:#1e293b;">编辑</div>
+
+              <!-- ID -->
+              <div class="dj-form-row">
+                <div class="dj-form-label" style="color:#64748b;">ID</div>
+                <div class="dj-form-val"><div class="dj-form-input" style="border-color:#e2e8f0;background:#fff;color:#94a3b8;">14</div></div>
+              </div>
+
+              <!-- 支付名称 -->
+              <div class="dj-form-row">
+                <div class="dj-form-label"><span style="color:#ef4444;margin-right:2px;">*</span> 支付名称</div>
+                <div class="dj-form-val filled"><div class="dj-form-input"><span style="color:#94a3b8;margin-right:6px;font-size:.85rem;">✏</span>188pay</div></div>
+              </div>
+
+              <!-- 商户 ID ★ 红框标注（对应 188pay 商户ID/pid） -->
+              <div class="dj-form-row">
+                <div class="dj-form-label" style="position:relative;padding:0;">
+                  <div style="border:2px solid #ef4444;border-radius:4px;padding:8px 10px;margin:3px;height:calc(100% - 6px);display:flex;align-items:center;gap:2px;font-size:.75rem;font-weight:700;">
+                    <span style="color:#ef4444;">*</span> 商户 ID
+                  </div>
+                </div>
+                <div class="dj-form-val filled"><div class="dj-form-input" style="gap:8px;"><span style="color:#94a3b8;font-size:.85rem;">✏</span><span style="font-family:monospace;font-size:.68rem;color:#475569;">eb763422-3cbe-4040-ad02-d7db175f1fc4</span><span style="color:#94a3b8;font-size:.68rem;white-space:nowrap;"> ← 商户ID填这里</span></div></div>
+              </div>
+
+              <!-- 商户 KEY ★ 红框（填 188pay 支付网关地址） -->
+              <div class="dj-form-row" style="align-items:flex-start;">
+                <div class="dj-form-label" style="position:relative;padding:0;align-self:stretch;">
+                  <div style="border:2px solid #ef4444;border-radius:4px;padding:8px 10px;margin:3px;height:calc(100% - 6px);display:flex;align-items:flex-start;font-size:.75rem;font-weight:700;padding-top:12px;">
+                    商户 KEY
+                  </div>
+                </div>
+                <div class="dj-form-val" style="padding:10px 12px;">
+                  <textarea style="width:100%;min-height:68px;border:1.5px solid #2563eb;border-radius:5px;padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#1e40af;background:#eff6ff;resize:none;box-shadow:0 0 0 3px rgba(37,99,235,.06);outline:none;">https://api2.188pay.top/submit.php   ← 支付网关填这里</textarea>
+                </div>
+              </div>
+
+              <!-- 商户密钥 ★ 红框（填 188pay 密钥） -->
+              <div class="dj-form-row" style="align-items:flex-start;">
+                <div class="dj-form-label" style="position:relative;padding:0;align-self:stretch;">
+                  <div style="border:2px solid #ef4444;border-radius:4px;padding:8px 10px;margin:3px;height:calc(100% - 6px);display:flex;align-items:flex-start;gap:2px;font-size:.75rem;font-weight:700;padding-top:12px;">
+                    <span style="color:#ef4444;">*</span> 商户密钥
+                  </div>
+                </div>
+                <div class="dj-form-val" style="padding:10px 12px;">
+                  <textarea style="width:100%;min-height:68px;border:1.5px solid #f59f00;border-radius:5px;padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#92400e;background:#fffbeb;resize:none;box-shadow:0 0 0 3px rgba(245,159,0,.06);outline:none;">hES9NhwspahJdOx6iiNbYRkoKaQgITnu   ← 密钥填这里</textarea>
+                </div>
+              </div>
+
+              <!-- Save -->
+              <div style="display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+                <div style="padding:7px 18px;background:#fff;border:1px solid #e2e8f0;border-radius:6px;font-size:.78rem;color:#64748b;cursor:pointer;">返回</div>
+                <div style="padding:7px 18px;background:#2563eb;border-radius:6px;font-size:.78rem;color:#fff;cursor:pointer;font-weight:600;">✓ 保存</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3个字段说明 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;">
+      <div style="background:var(--surface);border:1px solid rgba(239,68,68,.4);border-left:3px solid #ef4444;border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#fca5a5;margin-bottom:4px;">① 商户 ID</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">填入 188pay 的<strong style="color:var(--text);">商户ID（pid）</strong>，从 API密钥页面复制</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(79,110,247,.4);border-left:3px solid var(--accent);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#93a8fb;margin-bottom:4px;">② 商户 KEY</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">填入<strong style="color:var(--text);font-family:monospace;font-size:.72rem;">https://api2.188pay.top/submit.php</strong>（支付网关，从 API密钥页面复制）</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid rgba(245,159,0,.4);border-left:3px solid var(--warn);border-radius:8px;padding:12px 14px;">
+        <div style="font-size:.7rem;font-weight:700;color:#fbbf24;margin-bottom:4px;">③ 商户密钥</div>
+        <div style="font-size:.78rem;color:var(--text-soft);">填入 188pay 的<strong style="color:var(--text);">商户密钥</strong>，从 API密钥页面复制</div>
+      </div>
+    </div>
+
+    <div class="info-note green" style="margin-top:12px;">
+      <div class="info-note-icon">✅</div>
+      <div>
+        保存后开启启用开关，用户下单即可看到 188pay USDT 支付选项。如果支付不通，可尝试将「商户 KEY」改为 <code style="font-family:monospace;font-size:.8rem;">https://api2.188pay.top</code>（系统会自动拼接 /submit.php），或联系 <a href="https://t.me/token188" style="color:#86efac;">@token188</a> 获取帮助。
+      </div>
+    </div>
+  </div>
+  </div><!-- /step-flow -->
+
+  <!-- ── 参数速查 ── -->
+  <div class="section-header"><h2>参数速查</h2></div>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-label">名称（可自定义）</div>
+      <div class="summary-card-val">188pay USDT</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">支付路由（不要改）</div>
+      <div class="summary-card-val green">/pay/yipay</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">商户 ID（pid）</div>
+      <div class="summary-card-val">从 188pay 商户中心复制</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">商户密钥（key）</div>
+      <div class="summary-card-val">从 188pay 商户中心复制</div>
+    </div>
+    <div class="summary-card full">
+      <div class="summary-card-label">商户 KEY（网关地址） — 两个都可尝试，不同系统适配不同</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:.65rem;background:var(--accent-light);color:var(--accent);border-radius:4px;padding:2px 7px;white-space:nowrap;font-weight:700;">独角推荐</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);">https://api2.188pay.top/submit.php</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:.65rem;background:rgba(168,85,247,.12);color:#d8b4fe;border-radius:4px;padding:2px 7px;white-space:nowrap;font-weight:700;">备用</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#d8b4fe;">https://api2.188pay.top</span>
+          <span style="font-size:.68rem;color:var(--text-muted);">（系统自动拼 /submit.php）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Q&A ── -->
+  <div class="section-header" style="margin-top:40px;"><h2>常见问题</h2></div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 有很多易支付行，改哪一个？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">改任意一个即可，建议直接改名字里有「易支付」或路由是 <code style="font-family:monospace;color:var(--accent);">/pay/yipay</code> 的第一行。如果要同时接 USDT 和 TRX，可以分别改两行，商户KEY（网关）相同、商户ID与商户密钥相同，type 参数会自动传递。</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 改完后用户看到的是旧名字，怎么改？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">在编辑表单最上面的「支付名称」字段改为你想显示的名字（如 USDT 支付 / 188pay），这是前台用户看到的支付方式名称。</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;">
+      <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:6px;">❓ 旧版独角自定义插件还能用吗？</div>
+      <div style="font-size:.83rem;color:var(--text-soft);line-height:1.7;">旧插件走私有协议（字段名不兼容），不推荐继续使用。独角内置的易支付协议完全兼容 188pay，直接修改现有配置即可，无需任何插件。</div>
+    </div>
+  </div>
+
+  <!-- ── 错误排查 ── -->
+  <div class="section-header" style="margin-top:40px;"><h2>错误排查</h2></div>
+
+  <div style="background:rgba(245,159,0,.08);border:1px solid rgba(245,159,0,.35);border-left:3px solid var(--warn);border-radius:10px;padding:18px 20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid var(--warn);font-size:.72rem;font-weight:700;color:var(--warn);flex-shrink:0;">!</span>
+      <span style="font-weight:700;font-size:.9rem;color:#fbbf24;">常见错误排查：</span>
+    </div>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:9px;padding:0;">
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">网关地址填错：</strong>请确保包含 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">https://</code>，推荐填完整路径 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">https://api2.188pay.top/submit.php</code>，不要漏掉 <code style="font-family:monospace;font-size:.8rem;color:var(--text-soft);">/submit.php</code>。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">签名错误：</strong>请检查商户 ID 和商户密钥是否复制完整，粘贴时不要包含多余的空格或换行符。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">支付类型未生效：</strong>独角在创建订单时会自动传递 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">type=usdt</code> 或 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">type=trx</code>，如收款地址未添加或币种未开启，订单会报错。请先在 188pay 商户中心确认地址已添加并启用。</span>
+      </li>
+      <li style="display:flex;gap:8px;font-size:.83rem;color:var(--text-soft);line-height:1.65;">
+        <span style="color:var(--warn);flex-shrink:0;">•</span>
+        <span><strong style="color:var(--text);">支付成功但订单未自动完成：</strong>检查独角后台的 <code style="font-family:monospace;color:var(--accent);font-size:.8rem;">notify_url</code> 是否可被公网访问，本地开发环境（localhost）无法收到回调，需部署到公网。</span>
+      </li>
+    </ul>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(245,159,0,.2);font-size:.78rem;color:var(--text-muted);">
+      仍无法解决？联系 <a href="https://t.me/token188" style="color:var(--warn);text-decoration:none;font-weight:600;">Telegram @token188</a> 获取支持
+    </div>
+  </div>
+
+  <div class="footer">
+    188pay USDT 支付网关 &nbsp;·&nbsp; <a href="https://www.188pay.top">188pay.top</a> &nbsp;·&nbsp; Telegram: <a href="https://t.me/token188">@token188</a> &nbsp;·&nbsp; 频道: <a href="https://t.me/token188pay">@token188pay</a> &nbsp;·&nbsp; 公开群: <a href="https://t.me/coinpaybest">@coinpaybest</a>
+  </div>
+
+</div>
+</body>
+</html>

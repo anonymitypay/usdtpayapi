@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-188pay.top-brightgreen.svg)](https://www.188pay.top)
 [![Telegram](https://img.shields.io/badge/telegram-token188-blue.svg?logo=telegram)](https://t.me/token188)
+[![Channel](https://img.shields.io/badge/channel-token188pay-blue.svg?logo=telegram)](https://t.me/token188pay)
+[![Group](https://img.shields.io/badge/group-coinpaybest-blue.svg?logo=telegram)](https://t.me/coinpaybest)
 
 ---
 
@@ -523,6 +525,8 @@ def callback():
 - 官网：[188pay.top](https://www.188pay.top)
 - 商户平台：[www.188pay.top](https://www.188pay.top/login)
 - Telegram：[@token188](https://t.me/token188)
+- 频道：[@token188pay](https://t.me/token188pay)
+- 公开群：[@coinpaybest](https://t.me/coinpaybest)
 
 ---
 
