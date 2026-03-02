@@ -99,7 +99,7 @@
 | [WHMCS](https://www.whmcs.com/) | 主机域名管理系统 |
 | [Shopify](https://www.shopify.com/) | 电商平台 |
 | 风铃发卡 | 自动发卡平台 |
-| [ZFAKA](https://github.com/zlkbdotnet/zfaka) | 自动发卡平台 |
+| [ZFAKA](https://github.com/zlkbdotnet/zfaka) | 自动发卡平台，[查看 ZFAKA 专用插件安装教程](https://github.com/utgpay2/zfakausdt) |
 | 鲸发卡 | 自动发卡平台 |
 
 > 所有支持易支付 (EPay) 协议的系统都可以直接接入。
@@ -498,6 +498,10 @@ def callback():
 在 V2Board 后台 → 支付配置 → 添加支付方式 → 选择「易支付」：
 - **网关地址**：填写 API 密钥页面的「EPay 网关地址」，即 `https://你的域名`（V2Board 会自动拼接 `/submit.php`）
 - 商户 ID 和密钥同上
+
+### Q: 如何在 ZFAKA 中配置？
+
+ZFAKA 需要安装专用插件，详见 [ZFAKA 188Pay 插件安装教程](https://github.com/utgpay2/zfakausdt)。安装后在后台 → 支付设置 → 188Pay USDT 中配置商户ID、密钥和网关地址即可。
 
 ### Q: 回调一直失败怎么办？
 
