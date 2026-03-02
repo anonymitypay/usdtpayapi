@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/badge/platform-188pay.top-brightgreen.svg)](https://www.188pay.top)
 [![Telegram](https://img.shields.io/badge/telegram-token188-blue.svg?logo=telegram)](https://t.me/token188)
 [![Channel](https://img.shields.io/badge/channel-token188pay-blue.svg?logo=telegram)](https://t.me/token188pay)
-[![Group](https://img.shields.io/badge/group-coinpaybest-blue.svg?logo=telegram)](https://t.me/coinpaybest)
+[![Group](https://img.shields.io/badge/group-加入公开群-blue.svg?logo=telegram)](https://t.me/+dyDaHNvyQcY2MDBh)
 
 ---
 
@@ -530,7 +530,7 @@ ZFAKA 需要安装专用插件，详见 [ZFAKA 188Pay 插件安装教程](https:
 - 商户平台：[www.188pay.top](https://www.188pay.top/login)
 - Telegram：[@token188](https://t.me/token188)
 - 频道：[@token188pay](https://t.me/token188pay)
-- 公开群：[@coinpaybest](https://t.me/coinpaybest)
+- 公开群：[加入公开群](https://t.me/+dyDaHNvyQcY2MDBh)
 
 ---
 
